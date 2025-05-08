@@ -24,10 +24,10 @@ export interface UseLoggerOptions {
  * @category view
  */
 export function useLogger(name: string, options: UseLoggerOptions = {}) {
-  const outputChannel = options.outputChannel ?? useOutputChannel(name, 'log')
+  const outputChannel = options.outputChannel ?? useOutputChannel(name, { log: true })
 
   const createLoggerFunc = (type: string) => (...message: any[]) => {
-    outputChannel.appendLine((options.getPrefix?.(type) ?? `${new Date().toISOString()} [${type}] `) + message.join(' '))
+    outputChannel.appendLine((options.getPrefix?.(type) ?? '') + message.join(' '))
   }
 
   return {
