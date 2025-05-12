@@ -11,7 +11,7 @@ export = defineExtension(() => {
 ```
 
 ::: details TypeScript Configuration <span class="i-vscode-icons:file-type-typescript-official text-2xl mt--1 ml-1"></span>
-VSCode extensions should be CommonJS modules. Since `export =` statement is not allowed in ESM, you need to add this in your `tsconfig.json` to make TypeScript happy if you use a Bundler like `tsup`.
+VSCode extensions should be CommonJS modules. Since `export =` statement is not allowed in ESM, you need to add this in your `tsconfig.json` to make TypeScript happy if you use a Bundler like `tsup` or `tsdown`.
 
 ```json
 {

@@ -24,8 +24,8 @@
     "template"
   ],
   "scripts": {
-    "dev": "tsup --watch",
-    "build": "tsup",
+    "dev": "tsdown --watch",
+    "build": "tsdown",
     "check": "tsc --noEmit",
     "prepublishOnly": "npm run build"
   },
@@ -34,7 +34,7 @@
     "@types/prompts": "^2.4.9",
     "chalk": "^5.4.1",
     "prompts": "^2.4.2",
-    "tsup": "^8.4.0",
+    "tsdown": "^0.11.5",
     "typescript": "^5.8.3"
   }
 }

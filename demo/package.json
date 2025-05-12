@@ -57,8 +57,8 @@
     }
   },
   "scripts": {
-    "build": "tsup --env.NODE_ENV production --treeshake",
-    "dev": "tsup --watch ./src --watch ../packages --env.NODE_ENV development",
+    "build": "tsdown --env.NODE_ENV production",
+    "dev": "tsdown --watch ./src --watch ../packages --env.NODE_ENV development",
     "test": "vitest",
     "typecheck": "tsc --noEmit"
   },
@@ -67,7 +67,7 @@
     "@types/node": "18.x",
     "@types/vscode": "^1.99.1",
     "reactive-vscode": "workspace:*",
-    "tsup": "^8.4.0",
+    "tsdown": "^0.11.5",
     "typescript": "^5.8.3",
     "vite": "^5.4.19",
     "vitest": "^2.1.9"
