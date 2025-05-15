@@ -1,6 +1,5 @@
 <template>
   <span inline-block>
-    <i i-reactive-vscode:logo mr-1 mb-1 text-lg />
     <span>Reactive VSCode</span>
   </span>
 </template>

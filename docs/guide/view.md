@@ -6,7 +6,7 @@ Views are an important part of a VSCode extension. There are two types of views 
 
 As described in the [official documentation](https://code.visualstudio.com/api/references/contribution-points#contributes.viewsContainers), first, you need view containers to be defined in the `contributes.viewsContainers.[viewContainerType]` section in the `package.json`. Then you can define your views in the `contributes.views.[viewContainerId]` section.
 
-```json
+```json [package.json]
 {
   "contributes": {
     "viewsContainers": {

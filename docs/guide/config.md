@@ -6,7 +6,7 @@ An extension can contribute extension-specific settings.
 
 To define the settings in the `package.json`, you need to add the `contributes.configuration` field. The `configuration` field is an object that contains the configuration settings.
 
-```json
+```json [package.json]
 {
   "contributes": {
     "configuration": {

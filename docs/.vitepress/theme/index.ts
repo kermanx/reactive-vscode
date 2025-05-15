@@ -6,6 +6,7 @@ import DefaultTheme from 'vitepress/theme'
 import Layout from './Layout.vue'
 import '@shikijs/vitepress-twoslash/style.css'
 import 'virtual:uno.css'
+import 'virtual:group-icons.css'
 import './styles.css'
 
 export default {

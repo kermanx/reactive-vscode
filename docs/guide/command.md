@@ -8,7 +8,7 @@ There are some [built-in commands](https://code.visualstudio.com/api/references/
 
 As described in the [official documentation](https://code.visualstudio.com/api/references/contribution-points#contributes.commands), you need to define the commands in the `contributes.commands` field in the `package.json`.
 
-```json
+```json [package.json]
 {
   "contributes": {
     "commands": [
