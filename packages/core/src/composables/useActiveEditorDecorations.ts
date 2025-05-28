@@ -1,5 +1,7 @@
-import type { MaybeRefOrGetter } from '@reactive-vscode/reactivity'
-import type { DecorationOptions, DecorationRenderOptions, Range, TextEditorDecorationType } from 'vscode'
+import type { MaybeRef, MaybeRefOrGetter } from '@reactive-vscode/reactivity'
+import type { DecorationOptions, DecorationRenderOptions, Range, TextEditor, TextEditorDecorationType } from 'vscode'
+import type { Awaitable } from '../utils'
+import type { UseEditorDecorationsOptions } from './useEditorDecorations'
 import { useActiveTextEditor } from './useActiveTextEditor'
 import { useEditorDecorations } from './useEditorDecorations'
 
@@ -10,9 +12,12 @@ import { useEditorDecorations } from './useEditorDecorations'
  */
 export function useActiveEditorDecorations(
   decorationTypeOrOptions: MaybeRefOrGetter<TextEditorDecorationType | DecorationRenderOptions>,
-  rangesOrOptions: MaybeRefOrGetter<readonly Range[] | readonly DecorationOptions[]>,
+  decorations:
+    | MaybeRef<readonly Range[] | readonly DecorationOptions[]>
+    | ((editor: TextEditor) => Awaitable<readonly Range[] | readonly DecorationOptions[]>),
+  options: UseEditorDecorationsOptions = {},
 ) {
   const activeEditor = useActiveTextEditor()
 
-  useEditorDecorations(activeEditor, decorationTypeOrOptions, rangesOrOptions)
+  return useEditorDecorations(activeEditor, decorationTypeOrOptions, decorations, options)
 }
