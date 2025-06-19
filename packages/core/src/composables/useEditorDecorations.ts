@@ -1,5 +1,5 @@
 import type { MaybeRef, MaybeRefOrGetter } from '@reactive-vscode/reactivity'
-import type { DecorationOptions, DecorationRenderOptions, Range, TextEditor, TextEditorDecorationType } from 'vscode'
+import type { DecorationOptions, DecorationRenderOptions, Disposable, Range, TextEditor, TextEditorDecorationType } from 'vscode'
 import type { Awaitable, Nullable } from '../utils/types'
 import { computed, toValue, watch, watchEffect } from '@reactive-vscode/reactivity'
 import { window } from 'vscode'
@@ -32,13 +32,18 @@ export function useEditorDecorations(
     updateOn = ['effect', 'documentChanged'],
   } = options
 
+  let decorationTypeDisposable: Disposable | undefined
   const decorationType = computed<TextEditorDecorationType>(
-    (oldDecorationTypeOrOptions) => {
-      oldDecorationTypeOrOptions?.dispose()
+    () => {
+      decorationTypeDisposable?.dispose()
+      decorationTypeDisposable = undefined
+
       const decorationTypeOrOptionsValue = toValue(decorationTypeOrOptions)
-      return 'key' in decorationTypeOrOptionsValue
-        ? decorationTypeOrOptionsValue
-        : useDisposable(window.createTextEditorDecorationType(decorationTypeOrOptionsValue))
+      if ('key' in decorationTypeOrOptionsValue)
+        return decorationTypeOrOptionsValue
+      const decoration = window.createTextEditorDecorationType(decorationTypeOrOptionsValue)
+      decorationTypeDisposable = useDisposable(decoration)
+      return decoration
     },
   )
 
