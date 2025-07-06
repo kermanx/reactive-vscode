@@ -16,11 +16,11 @@
     "creator"
   ],
   "bin": {
-    "create-reactive-vscode": "./dist/index.cjs"
+    "create-reactive-vscode": "./dist/index.js"
   },
   "files": [
     "README.md",
-    "dist/index.cjs",
+    "dist/index.js",
     "template"
   ],
   "scripts": {

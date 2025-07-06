@@ -4,7 +4,7 @@ import { window } from 'vscode'
 import { message } from './configs'
 import { logger } from './utils'
 
-export = defineExtension(() => {
+export const { activate, deactivate } = defineExtension(() => {
   logger.info('Extension Activated')
 
   useCommand('${identifier}.helloWorld', () => {
