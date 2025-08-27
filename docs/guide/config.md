@@ -113,8 +113,9 @@ Visit the [official documentation](https://code.visualstudio.com/api/references/
 You can also use the [`vscode-ext-gen`](https://github.com/antfu/vscode-ext-gen) to generate the configuration settings. For example:
 
 ```ts
+import type { NestedScopedConfigs } from './generated-meta'
 import { defineConfigObject, defineConfigs, reactive, ref } from 'reactive-vscode'
-import { type NestedScopedConfigs, scopedConfigs } from './generated-meta'
+import { scopedConfigs } from './generated-meta'
 
 const config = defineConfigObject<NestedScopedConfigs>(
   scopedConfigs.scope,

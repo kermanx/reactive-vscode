@@ -39,16 +39,16 @@
     "prepublishOnly": "pnpm typecheck && pnpm build"
   },
   "peerDependencies": {
-    "@types/vscode": "^1.101.0"
+    "@types/vscode": "^1.102.0"
   },
   "dependencies": {
     "@reactive-vscode/reactivity": "workspace:*"
   },
   "devDependencies": {
-    "@types/node": "^20.19.1",
-    "@types/vscode": "^1.101.0",
-    "typescript": "^5.8.3",
-    "vite": "^5.4.19",
+    "@types/node": "^22.10.7",
+    "@types/vscode": "^1.102.0",
+    "typescript": "^5.9.2",
+    "vite": "^7.1.3",
     "vite-plugin-dts": "^4.5.4"
   },
   "publishConfig": {

@@ -34,10 +34,10 @@
     "prepublishOnly": "pnpm typecheck && pnpm build"
   },
   "devDependencies": {
-    "@vue/reactivity": "^3.5.17",
-    "@vue/shared": "^3.5.17",
-    "typescript": "^5.8.3",
-    "vite": "^5.4.19",
+    "@vue/reactivity": "^3.5.20",
+    "@vue/shared": "^3.5.20",
+    "typescript": "^5.9.2",
+    "vite": "^7.1.3",
     "vite-plugin-dts": "^4.5.4"
   },
   "publishConfig": {
