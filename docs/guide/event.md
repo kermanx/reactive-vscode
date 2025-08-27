@@ -23,6 +23,7 @@ export = defineExtension(() => {
 <!-- eslint-disable import/first -->
 ```ts
 import type { Event } from 'vscode'
+
 declare function someVscodeApi(options: { onSomeEvent: Event<string> }): void
 // ---cut---
 import { defineExtension, useEventEmitter } from 'reactive-vscode'

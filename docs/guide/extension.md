@@ -26,6 +26,7 @@ Or you can avoid the `export =` statement in this way:
 
 ```ts
 import { defineExtension } from 'reactive-vscode'
+
 const { activate, deactivate } = defineExtension(() => {
   // Your extension code here
 })

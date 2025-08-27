@@ -1,4 +1,5 @@
-import { type LogOutputChannel, type OutputChannel, window } from 'vscode'
+import type { LogOutputChannel, OutputChannel } from 'vscode'
+import { window } from 'vscode'
 import { useDisposable } from './useDisposable'
 
 /**

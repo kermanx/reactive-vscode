@@ -1,7 +1,7 @@
 {
   "name": "create-reactive-vscode",
   "type": "module",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Reactive-vscode project creator",
   "author": "_Kerman <kermanx@qq.com>",
   "license": "MIT",
@@ -30,11 +30,11 @@
     "prepublishOnly": "npm run build"
   },
   "devDependencies": {
-    "@types/node": "^20.19.1",
+    "@types/node": "^22.10.7",
     "@types/prompts": "^2.4.9",
     "chalk": "^5.4.1",
     "prompts": "^2.4.2",
     "tsdown": "^0.11.13",
-    "typescript": "^5.8.3"
+    "typescript": "^5.9.2"
   }
 }

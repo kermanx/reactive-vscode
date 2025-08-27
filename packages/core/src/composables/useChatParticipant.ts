@@ -1,5 +1,6 @@
+import type { MaybeRef, MaybeRefOrGetter } from '@reactive-vscode/reactivity'
 import type { ChatFollowupProvider, ChatRequestHandler, IconPath } from 'vscode'
-import { type MaybeRef, type MaybeRefOrGetter, unref, watchEffect } from '@reactive-vscode/reactivity'
+import { unref, watchEffect } from '@reactive-vscode/reactivity'
 import { chat } from 'vscode'
 import { createKeyedComposable } from '../utils'
 import { useDisposable } from './useDisposable'

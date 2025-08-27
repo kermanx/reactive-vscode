@@ -14,17 +14,17 @@ export interface TreeViewNode {
   readonly treeItem: TreeItem | Thenable<TreeItem>
 }
 
-export type UseTreeViewOptions<T> =
-  & Omit<TreeViewOptions<T>, 'treeDataProvider'>
-  & Pick<TreeDataProvider<T>, 'resolveTreeItem'>
-  & {
-    title?: MaybeRefOrGetter<string | undefined>
-    badge?: MaybeRefOrGetter<ViewBadge | undefined>
-    /**
-     * Additional watch source to trigger a change event. Useful when `treeItem` is a promise.
-     */
-    watchSource?: AnyWatchSource
-  }
+export type UseTreeViewOptions<T>
+  = & Omit<TreeViewOptions<T>, 'treeDataProvider'>
+    & Pick<TreeDataProvider<T>, 'resolveTreeItem'>
+    & {
+      title?: MaybeRefOrGetter<string | undefined>
+      badge?: MaybeRefOrGetter<ViewBadge | undefined>
+      /**
+       * Additional watch source to trigger a change event. Useful when `treeItem` is a promise.
+       */
+      watchSource?: AnyWatchSource
+    }
 
 /**
  * Register a tree view. See `vscode::window.createTreeView`.
