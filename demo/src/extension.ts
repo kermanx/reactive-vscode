@@ -7,7 +7,7 @@ import { useDemoWebviewView } from './webviewView'
 
 const logger = useLogger('Reactive VSCode')
 
-export = defineExtension(() => {
+export const { activate, deactivate } = defineExtension(() => {
   logger.info('Extension Activated')
   logger.show()
 
