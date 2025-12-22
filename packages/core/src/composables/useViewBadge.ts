@@ -16,7 +16,8 @@ export function useViewBadge(
 ) {
   watchEffect(() => {
     const viewValue = toValue(view)
-    if (viewValue)
+    if (viewValue) {
       viewValue.badge = toValue(badge)
+    }
   })
 }

@@ -39,6 +39,6 @@ export function useTerminal(...args: any[]): UseTerminalReturn {
     sendText: terminal.sendText.bind(terminal),
     show: terminal.show.bind(terminal),
     hide: terminal.hide.bind(terminal),
-    state: useTerminalState(terminal) as ComputedRef<TerminalState>,
+    state: useTerminalState(terminal),
   }
 }

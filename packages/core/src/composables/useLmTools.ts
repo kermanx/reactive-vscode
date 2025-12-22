@@ -1,6 +1,6 @@
 import { computed, shallowRef } from '@reactive-vscode/reactivity'
 import { lm } from 'vscode'
-import { createSingletonComposable } from '../utils'
+import { defineService } from '../utils'
 import { useDisposable } from './useDisposable'
 
 /**
@@ -9,7 +9,7 @@ import { useDisposable } from './useDisposable'
  * @reactive `lm.tools`
  * @category lm
  */
-export const useLmTools = createSingletonComposable(() => {
+export const useLmTools = defineService(() => {
   const tools = shallowRef(lm.tools)
 
   useDisposable(lm.onDidChangeChatModels(() => {

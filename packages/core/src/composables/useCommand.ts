@@ -1,4 +1,6 @@
-import type { Commands } from '../utils'
+import type { MaybeRef } from '@reactive-vscode/reactivity'
+import type { Nullable } from '../utils'
+import { isRef, watchEffect } from '@reactive-vscode/reactivity'
 import { commands } from 'vscode'
 import { useDisposable } from './useDisposable'
 
@@ -7,6 +9,16 @@ import { useDisposable } from './useDisposable'
  *
  * @category commands
  */
-export function useCommand<K extends Extract<keyof Commands, string>>(command: K, callback: Commands[K]) {
-  useDisposable(commands.registerCommand(command, callback))
+export function useCommand(command: string, callback: MaybeRef<Nullable<(...args: any[]) => any>>) {
+  if (isRef(callback)) {
+    watchEffect((onCleanup) => {
+      if (callback.value) {
+        const disposable = commands.registerCommand(command, callback.value)
+        onCleanup(() => disposable.dispose())
+      }
+    })
+  }
+  else if (callback) {
+    useDisposable(commands.registerCommand(command, callback))
+  }
 }

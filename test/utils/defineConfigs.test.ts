@@ -2,7 +2,7 @@ import type { ConfigRef, ConfigType } from 'reactive-vscode'
 import { defineConfigs } from 'reactive-vscode'
 import { describe, expectTypeOf, it } from 'vitest'
 
-describe('keyedComposable', () => {
+describe('defineConfigs', () => {
   it.skip('should have correct type', () => {
     expectTypeOf(
       defineConfigs('test', {

@@ -1,11 +1,11 @@
-import { defineExtension, useCommand, useIsDarkTheme, useLogger, watchEffect } from 'reactive-vscode'
+import { defineExtension, defineLogger, useCommand, useIsDarkTheme, watchEffect } from 'reactive-vscode'
 import { window } from 'vscode'
 import { message } from './configs'
 import { calledTimes } from './states'
 import { useDemoTreeView } from './treeView'
 import { useDemoWebviewView } from './webviewView'
 
-const logger = useLogger('Reactive VSCode')
+const logger = defineLogger('Reactive VSCode')
 
 export = defineExtension(() => {
   logger.info('Extension Activated')

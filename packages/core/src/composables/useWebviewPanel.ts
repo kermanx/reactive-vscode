@@ -1,8 +1,9 @@
 import type { MaybeRefOrGetter } from '@reactive-vscode/reactivity'
-import type { WebviewOptions } from 'vscode'
-import { ref, shallowRef, toValue, watchEffect } from '@reactive-vscode/reactivity'
+import type { WebviewOptions, WebviewPanel } from 'vscode'
+import { computed, isRef, shallowRef, toValue, watch, watchEffect } from '@reactive-vscode/reactivity'
 import { window } from 'vscode'
 import { useDisposable } from './useDisposable'
+import { useReactiveOptions } from './useReactiveOptions'
 import { useViewTitle } from './useViewTitle'
 
 export interface WebviewPanelRegisterOptions {
@@ -10,6 +11,7 @@ export interface WebviewPanelRegisterOptions {
   retainContextWhenHidden?: boolean
   onDidReceiveMessage?: (message: any) => void
   webviewOptions?: MaybeRefOrGetter<WebviewOptions>
+  iconPath?: MaybeRefOrGetter<WebviewPanel['iconPath']>
 }
 
 /**
@@ -24,7 +26,7 @@ export function useWebviewPanel(
   showOptions: Parameters<typeof window.createWebviewPanel>[2],
   options?: WebviewPanelRegisterOptions,
 ) {
-  const context = shallowRef<unknown>()
+  const webviewOptions = options?.webviewOptions
   const panel = useDisposable(window.createWebviewPanel(
     viewType,
     toValue(title),
@@ -32,42 +34,64 @@ export function useWebviewPanel(
     {
       enableFindWidget: options?.enableFindWidget,
       retainContextWhenHidden: options?.retainContextWhenHidden,
-      ...toValue(options?.webviewOptions),
+      ...toValue(webviewOptions),
     },
   ))
+  const webview = panel.webview
 
-  if (options?.onDidReceiveMessage)
-    panel.webview.onDidReceiveMessage(options.onDidReceiveMessage)
+  if (isRef(title) || typeof title === 'function') {
+    useViewTitle(panel, title)
+  }
 
-  const forceRefreshId = ref(0)
+  if (options) {
+    useReactiveOptions(panel, options, [
+      'iconPath',
+    ])
+  }
+
+  if (options?.onDidReceiveMessage) {
+    webview.onDidReceiveMessage(options.onDidReceiveMessage)
+  }
+
+  const forceRefreshId = shallowRef(0)
 
   function forceRefresh() {
     forceRefreshId.value++
   }
 
   watchEffect(() => {
-    panel.webview.html = `${toValue(html)}<!--${forceRefreshId.value}-->`
+    webview.html = `${toValue(html)}<!--${forceRefreshId.value}-->`
   })
 
-  if (options?.webviewOptions) {
-    const webviewOptions = options.webviewOptions
-    watchEffect(() => {
-      panel.webview.options = toValue(webviewOptions)
+  if (webviewOptions && (isRef(webviewOptions) || typeof webviewOptions === 'function')) {
+    watch(webviewOptions, (webviewOptions) => {
+      webview.options = webviewOptions
     })
   }
 
-  useViewTitle(panel, title)
-
   function postMessage(message: any) {
-    return panel.webview.postMessage(message)
+    return webview.postMessage(message)
   }
 
-  const active = ref(panel.active)
-  const visible = ref(panel.visible)
-  useDisposable(panel.onDidChangeViewState(() => {
-    active.value = panel.active
-    visible.value = panel.visible
+  const viewColumn = shallowRef(panel.viewColumn)
+  const active = shallowRef(panel.active)
+  const visible = shallowRef(panel.visible)
+  useDisposable(panel.onDidChangeViewState((ev) => {
+    if (panel === ev.webviewPanel) {
+      viewColumn.value = panel.viewColumn
+      active.value = panel.active
+      visible.value = panel.visible
+    }
   }))
 
-  return { panel, context, active, visible, postMessage, forceRefresh }
+  return {
+    panel,
+    webview,
+    viewColumn: computed(() => viewColumn.value),
+    active: computed(() => active.value),
+    visible: computed(() => visible.value),
+    postMessage,
+    forceRefresh,
+    reveal: panel.reveal.bind(panel),
+  }
 }

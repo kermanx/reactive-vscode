@@ -1,18 +1,18 @@
-import { shallowRef } from '@reactive-vscode/reactivity'
+import { computed, shallowRef } from '@reactive-vscode/reactivity'
 import { window } from 'vscode'
-import { createSingletonComposable } from '../utils'
+import { defineService } from '../utils'
 import { useDisposable } from './useDisposable'
 
 /**
  * @reactive `window.activeTextEditor`
  * @category editor
  */
-export const useActiveTextEditor = createSingletonComposable(() => {
+export const useActiveTextEditor = defineService(() => {
   const activeTextEditor = shallowRef(window.activeTextEditor)
 
   useDisposable(window.onDidChangeActiveTextEditor((editor) => {
     activeTextEditor.value = editor
   }))
 
-  return activeTextEditor
+  return computed(() => activeTextEditor.value)
 })

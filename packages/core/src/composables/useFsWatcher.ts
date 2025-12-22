@@ -1,12 +1,12 @@
-import type { MaybeRefOrGetter, ShallowReactive } from '@reactive-vscode/reactivity'
+import type { MaybeRefOrGetter } from '@reactive-vscode/reactivity'
 import type { Event, FileSystemWatcher, GlobPattern, Uri } from 'vscode'
 import type { MaybeNullableRefOrGetter } from '../utils'
-import { computed, onScopeDispose, shallowReactive, toValue, watch } from '@reactive-vscode/reactivity'
+import { computed, onScopeDispose, readonly, shallowReactive, toValue, watch } from '@reactive-vscode/reactivity'
 import { workspace } from 'vscode'
 import { useEventEmitter } from './useEventEmitter'
 
 export interface UseFSWatcher {
-  readonly watchers: ShallowReactive<Map<GlobPattern, FileSystemWatcher>>
+  readonly watchers: ReadonlyMap<GlobPattern, FileSystemWatcher>
   readonly onDidCreate: Event<Uri>
   readonly onDidChange: Event<Uri>
   readonly onDidDelete: Event<Uri>
@@ -16,7 +16,7 @@ export interface UseFSWatcher {
  * @reactive `workspace.createFileSystemWatcher`
  */
 export function useFsWatcher(
-  globPattern: MaybeRefOrGetter<GlobPattern | readonly GlobPattern[] | ReadonlySet<GlobPattern>>,
+  globPatterns: MaybeRefOrGetter<GlobPattern | readonly GlobPattern[] | ReadonlySet<GlobPattern>>,
   ignoreCreateEvents?: MaybeNullableRefOrGetter<boolean>,
   ignoreChangeEvents?: MaybeNullableRefOrGetter<boolean>,
   ignoreDeleteEvents?: MaybeNullableRefOrGetter<boolean>,
@@ -26,19 +26,21 @@ export function useFsWatcher(
   const changeEmitter = useEventEmitter<Uri>()
   const deleteEmitter = useEventEmitter<Uri>()
 
-  const normalizedPatterns = computed(() => {
-    const globPatternValue = toValue(globPattern)
-    return Array.isArray(globPatternValue)
-      ? globPatternValue
-      : globPatternValue instanceof Set
-        ? Array.from(globPatternValue)
-        : [globPatternValue]
+  const patterns = computed(() => {
+    const patterns = toValue(globPatterns)
+    return patterns instanceof Set
+      ? patterns
+      : new Set(
+          Array.isArray(patterns)
+            ? patterns
+            : [patterns],
+        )
   })
 
   function updateWatchers() {
-    const newPatterns = normalizedPatterns.value
+    const newPatterns = patterns.value
     for (const [pattern, watcher] of watchers) {
-      if (!newPatterns.includes(pattern)) {
+      if (!newPatterns.has(pattern)) {
         watcher.dispose()
         watchers.delete(pattern)
       }
@@ -68,7 +70,7 @@ export function useFsWatcher(
 
   updateWatchers()
 
-  watch(normalizedPatterns, updateWatchers)
+  watch(patterns, updateWatchers)
   watch(
     () => [
       toValue(ignoreCreateEvents),
@@ -83,7 +85,7 @@ export function useFsWatcher(
   onScopeDispose(clearWatchers)
 
   return {
-    watchers,
+    watchers: readonly(watchers),
     onDidCreate: createEmitter.event,
     onDidChange: changeEmitter.event,
     onDidDelete: deleteEmitter.event,

@@ -4,9 +4,9 @@ import { useDisposable } from './useDisposable'
 import { useEvent } from './useEvent'
 
 interface UseEventEmitterReturn<T> {
+  emitter: EventEmitter<T>
   event: Event<T>
-  fire: (data: T) => void
-  addListener: (listener: (e: T) => any) => void
+  fire: EventEmitter<T>['fire']
 }
 
 /**
@@ -14,19 +14,15 @@ interface UseEventEmitterReturn<T> {
  * @reactive `EventEmitter`
  */
 export function useEventEmitter<T>(eventEmitter?: EventEmitter<T>, listeners?: ((e: T) => any)[]): UseEventEmitterReturn<T>
-export function useEventEmitter<T>(listeners?: ((e: T) => any)[]): UseEventEmitterReturn<T>
-export function useEventEmitter<T>(eventEmitterOrLlisteners?: EventEmitter<T> | ((e: T) => any)[], listeners2: ((e: T) => any)[] = []) {
-  const listeners = Array.isArray(eventEmitterOrLlisteners) ? eventEmitterOrLlisteners : listeners2 ?? []
-  const emitter = useDisposable(Array.isArray(eventEmitterOrLlisteners) || eventEmitterOrLlisteners == null ? new EventEmitter<T>() : eventEmitterOrLlisteners)
-
-  const addListener = useEvent(emitter.event, listeners)
-
-  for (const listener of listeners)
-    addListener(listener)
+export function useEventEmitter<T>(listeners: ((e: T) => any)[]): UseEventEmitterReturn<T>
+export function useEventEmitter<T>(eventEmitterOrListeners?: EventEmitter<T> | ((e: T) => any)[], listeners2: ((e: T) => any)[] = []) {
+  const listeners = Array.isArray(eventEmitterOrListeners) ? eventEmitterOrListeners : listeners2 ?? []
+  const emitter = useDisposable(Array.isArray(eventEmitterOrListeners) || eventEmitterOrListeners == null ? new EventEmitter<T>() : eventEmitterOrListeners)
+  const event = useEvent(emitter.event, listeners)
 
   return {
-    event: emitter.event,
+    emitter,
+    event,
     fire: emitter.fire.bind(emitter),
-    addListener,
   }
 }

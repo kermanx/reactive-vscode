@@ -1,7 +1,7 @@
 import type { MaybeRef, MaybeRefOrGetter } from '@reactive-vscode/reactivity'
 import type { DecorationOptions, DecorationRenderOptions, Disposable, Range, TextEditor, TextEditorDecorationType } from 'vscode'
-import type { Awaitable, Nullable } from '../utils/types'
-import { computed, toValue, watch, watchEffect } from '@reactive-vscode/reactivity'
+import type { Awaitable, MaybeNullableRefOrGetter } from '../utils/types'
+import { computed, onScopeDispose, toValue, watch, watchEffect } from '@reactive-vscode/reactivity'
 import { window } from 'vscode'
 import { useDisposable } from './useDisposable'
 import { useDocumentText } from './useDocumentText'
@@ -21,7 +21,7 @@ export interface UseEditorDecorationsOptions {
  * @category editor
  */
 export function useEditorDecorations(
-  editor: MaybeRefOrGetter<Nullable<TextEditor>>,
+  editor: MaybeNullableRefOrGetter<TextEditor>,
   decorationTypeOrOptions: MaybeRefOrGetter<TextEditorDecorationType | DecorationRenderOptions>,
   decorations:
     | MaybeRef<readonly Range[] | readonly DecorationOptions[]>
@@ -46,6 +46,7 @@ export function useEditorDecorations(
       return decoration
     },
   )
+  onScopeDispose(() => decorationTypeDisposable?.dispose())
 
   const update = async () => {
     const editorValue = toValue(editor)

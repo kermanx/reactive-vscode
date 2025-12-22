@@ -1,7 +1,7 @@
 import type { ComputedRef } from '@reactive-vscode/reactivity'
 import type { TreeView, WebviewView } from 'vscode'
 import type { MaybeNullableRefOrGetter } from '../utils/types'
-import { computed, ref, toValue, watchEffect } from '@reactive-vscode/reactivity'
+import { computed, isRef, ref, toValue, watch, watchEffect } from '@reactive-vscode/reactivity'
 
 type ViewWithVisibility = Pick<TreeView<unknown> | WebviewView, 'visible' | 'onDidChangeVisibility'>
 
@@ -13,20 +13,21 @@ type ViewWithVisibility = Pick<TreeView<unknown> | WebviewView, 'visible' | 'onD
 export function useViewVisibility(view: MaybeNullableRefOrGetter<ViewWithVisibility>): ComputedRef<boolean> {
   const visible = ref(toValue(view)?.visible)
 
-  function update() {
-    visible.value = toValue(view)?.visible
+  if (isRef(view) || typeof view === 'function') {
+    watch(view, (newView) => {
+      visible.value = newView?.visible
+    })
   }
 
   watchEffect((onCleanup) => {
     const viewValue = toValue(view)
     if (viewValue) {
-      const disposable = viewValue.onDidChangeVisibility(update)
+      const disposable = viewValue.onDidChangeVisibility(() => {
+        visible.value = viewValue.visible
+      })
       onCleanup(() => disposable.dispose())
     }
   })
 
-  watchEffect(update)
-
-  // Visibility should be readonly
   return computed(() => !!visible.value)
 }

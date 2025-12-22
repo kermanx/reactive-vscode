@@ -55,12 +55,13 @@ import type { Ref } from 'reactive-vscode'
  */
 declare const message: Ref<string>
 // ---cut---
-import { defineExtension, useCommand, useIsDarkTheme, useLogger, watchEffect } from 'reactive-vscode'
+import { defineExtension, defineLogger, useCommand, useIsDarkTheme, watchEffect } from 'reactive-vscode'
 import { window } from 'vscode'
 import { useDemoTreeView } from './treeView'
 
+const logger = defineLogger('Reactive VSCode')
+
 export = defineExtension(() => {
-  const logger = useLogger('Reactive VSCode')
   logger.info('Extension Activated')
   logger.show()
 

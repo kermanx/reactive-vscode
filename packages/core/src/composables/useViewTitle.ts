@@ -16,7 +16,8 @@ export function useViewTitle(
 ) {
   watchEffect(() => {
     const viewValue = toValue(view)
-    if (viewValue)
+    if (viewValue) {
       viewValue.title = toValue(title)
+    }
   })
 }

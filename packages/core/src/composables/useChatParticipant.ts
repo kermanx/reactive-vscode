@@ -1,26 +1,25 @@
 import type { MaybeRef, MaybeRefOrGetter } from '@reactive-vscode/reactivity'
 import type { ChatFollowupProvider, ChatRequestHandler, IconPath } from 'vscode'
-import { unref, watchEffect } from '@reactive-vscode/reactivity'
+import { toValue, unref, watch, watchEffect } from '@reactive-vscode/reactivity'
 import { chat } from 'vscode'
-import { createKeyedComposable } from '../utils'
 import { useDisposable } from './useDisposable'
 import { useEvent } from './useEvent'
 import { useReactiveOptions } from './useReactiveOptions'
 
 export interface ChatParticipantOptions {
   iconPath?: MaybeRefOrGetter<IconPath>
-  followupProvider?: MaybeRef<ChatFollowupProvider>
+  followupProvider?: MaybeRefOrGetter<ChatFollowupProvider>
 }
 
 /**
  * @reactive `chat.createChatParticipant`
  * @category chat
  */
-export const useChatParticipant = createKeyedComposable((
+export function useChatParticipant(
   id: string,
   handler: MaybeRef<ChatRequestHandler>,
   options: ChatParticipantOptions = {},
-) => {
+) {
   const participant = useDisposable(chat.createChatParticipant(id, unref(handler)))
 
   useReactiveOptions(participant, options, [
@@ -29,15 +28,16 @@ export const useChatParticipant = createKeyedComposable((
 
   if (options.followupProvider !== undefined) {
     watchEffect(() => {
-      participant.followupProvider = unref(options.followupProvider)
+      participant.followupProvider = toValue(options.followupProvider)
     })
   }
 
-  watchEffect(() => {
-    participant.requestHandler = unref(handler)
+  watch(() => unref(handler), (handler) => {
+    participant.requestHandler = handler
   })
 
   return {
+    participant,
     onDidReceiveFeedback: useEvent(participant.onDidReceiveFeedback),
   }
-}, id => id)
+}
