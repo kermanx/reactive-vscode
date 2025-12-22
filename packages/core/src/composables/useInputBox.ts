@@ -78,11 +78,11 @@ export interface InputBoxOptions extends QuickInputOptions {
 export function useInputBox(
   options: InputBoxOptions = {},
 ) {
-  const InputBox = useDisposable(window.createInputBox())
+  const inputBox = useDisposable(window.createInputBox())
 
-  useQuickInputOptions(InputBox, options)
+  useQuickInputOptions(inputBox, options)
 
-  useReactiveOptions(InputBox, options, [
+  useReactiveOptions(inputBox, options, [
     'valueSelection',
     'placeholder',
     'password',
@@ -91,18 +91,18 @@ export function useInputBox(
     'validationMessage',
   ])
 
-  useReactiveEvents(InputBox, options, [
+  useReactiveEvents(inputBox, options, [
     'onDidChangeValue',
     'onDidAccept',
     'onDidTriggerButton',
   ])
 
-  const value = shallowRef(options.value ?? InputBox.value)
-  InputBox.onDidChangeValue(v => value.value = v)
-  watchEffect(() => InputBox.value = value.value)
+  const value = shallowRef(options.value ?? inputBox.value)
+  inputBox.onDidChangeValue(v => value.value = v)
+  watchEffect(() => inputBox.value = value.value)
 
   return {
-    ...InputBox,
+    ...inputBox,
     value,
   }
 }

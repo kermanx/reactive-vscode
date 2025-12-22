@@ -24,16 +24,16 @@ export function useWebviewPanel(
   title: MaybeRefOrGetter<string>,
   html: MaybeRefOrGetter<string>,
   showOptions: Parameters<typeof window.createWebviewPanel>[2],
-  options?: WebviewPanelRegisterOptions,
+  options: WebviewPanelRegisterOptions = {},
 ) {
-  const webviewOptions = options?.webviewOptions
+  const webviewOptions = options.webviewOptions
   const panel = useDisposable(window.createWebviewPanel(
     viewType,
     toValue(title),
     showOptions,
     {
-      enableFindWidget: options?.enableFindWidget,
-      retainContextWhenHidden: options?.retainContextWhenHidden,
+      enableFindWidget: options.enableFindWidget,
+      retainContextWhenHidden: options.retainContextWhenHidden,
       ...toValue(webviewOptions),
     },
   ))
@@ -43,13 +43,11 @@ export function useWebviewPanel(
     useViewTitle(panel, title)
   }
 
-  if (options) {
-    useReactiveOptions(panel, options, [
-      'iconPath',
-    ])
-  }
+  useReactiveOptions(panel, options, [
+    'iconPath',
+  ])
 
-  if (options?.onDidReceiveMessage) {
+  if (options.onDidReceiveMessage) {
     webview.onDidReceiveMessage(options.onDidReceiveMessage)
   }
 

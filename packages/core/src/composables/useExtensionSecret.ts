@@ -40,7 +40,7 @@ export function useExtensionSecret(key: string) {
   const result = computed({
     get: () => value.value,
     set: (newValue: string | undefined) => {
-      if (newValue == null) {
+      if (newValue === undefined) {
         remove()
       }
       else {

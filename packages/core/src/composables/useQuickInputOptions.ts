@@ -37,7 +37,7 @@ export interface QuickInputOptions {
   busy?: MaybeRefOrGetter<boolean>
 
   /**
-   * If the UI should stay open even when loosing UI focus. Defaults to false.
+   * If the UI should stay open even when losing UI focus. Defaults to false.
    * This setting is ignored on iPad and is always false.
    */
   ignoreFocusOut?: MaybeRefOrGetter<boolean>
