@@ -57,7 +57,9 @@ export function watchSyncEffect(
   return doWatch(
     effect,
     null,
-    __DEV__ ? extend({}, options as any, { flush: 'sync' }) : { flush: 'sync' },
+    __DEV__
+      ? extend({}, options as WatchEffectOptions, { flush: 'sync' })
+      : { flush: 'sync' },
   )
 }
 
@@ -185,12 +187,15 @@ function doWatch(
   return watchHandle
 }
 
-export function createPathGetter(ctx: any, path: string) {
+export function createPathGetter(
+  ctx: any,
+  path: string,
+): () => WatchSource | WatchSource[] | WatchEffect | object {
   const segments = path.split('.')
-  return (): any => {
+  return (): WatchSource | WatchSource[] | WatchEffect | object => {
     let cur = ctx
     for (let i = 0; i < segments.length && cur; i++) {
-      cur = cur[segments[i]]
+      cur = cur[segments[i] as keyof typeof cur]
     }
     return cur
   }
