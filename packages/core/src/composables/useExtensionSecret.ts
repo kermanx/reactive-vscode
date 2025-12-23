@@ -3,6 +3,19 @@ import { computed, shallowRef } from '@reactive-vscode/reactivity'
 import { extensionContext } from '../utils'
 import { useDisposable } from './useDisposable'
 
+export type ExtensionSecretRef = WritableComputedRef<string | null | undefined, string | undefined> & {
+  /**
+   * Set the secret value. Compared to directly setting the `value`, this method
+   * returns a promise that resolves when the secret has been stored.
+   */
+  set: (newValue: string) => Promise<void>
+  /**
+   * Remove the secret value. Compared to directly setting the `value` to `undefined`,
+   * this method returns a promise that resolves when the secret has been deleted.
+   */
+  remove: () => Promise<void>
+}
+
 /**
  * Get a reactive secret value from the extension's secrets.
  *
@@ -12,7 +25,7 @@ import { useDisposable } from './useDisposable'
  * @reactive `ExtensionContext.secrets`
  * @category extension
  */
-export function useExtensionSecret(key: string) {
+export function useExtensionSecret(key: string): ExtensionSecretRef {
   const secrets = extensionContext.value!.secrets
 
   const value = shallowRef<string | null | undefined>(null)
@@ -38,8 +51,10 @@ export function useExtensionSecret(key: string) {
   }
 
   const result = computed({
-    get: () => value.value,
-    set: (newValue: string | undefined) => {
+    get() {
+      return value.value
+    },
+    set(newValue: string | undefined) {
       if (newValue === undefined) {
         remove()
       }
@@ -47,18 +62,7 @@ export function useExtensionSecret(key: string) {
         set(newValue)
       }
     },
-  }) as WritableComputedRef<string | null | undefined, string | undefined> & {
-    /**
-     * Set the secret value. Compared to directly setting the `value`, this method
-     * returns a promise that resolves when the secret has been stored.
-     */
-    set: (newValue: string) => Promise<void>
-    /**
-     * Remove the secret value. Compared to directly setting the `value` to `undefined`,
-     * this method returns a promise that resolves when the secret has been deleted.
-     */
-    remove: () => Promise<void>
-  }
+  }) as ExtensionSecretRef
   result.set = set
   result.remove = remove
 

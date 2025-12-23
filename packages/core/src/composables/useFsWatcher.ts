@@ -1,26 +1,20 @@
 import type { MaybeRefOrGetter } from '@reactive-vscode/reactivity'
-import type { Event, FileSystemWatcher, GlobPattern, Uri } from 'vscode'
-import type { MaybeNullableRefOrGetter } from '../utils'
+import type { FileSystemWatcher, GlobPattern, Uri } from 'vscode'
 import { computed, onScopeDispose, readonly, shallowReactive, toValue, watch } from '@reactive-vscode/reactivity'
 import { workspace } from 'vscode'
 import { useEventEmitter } from './useEventEmitter'
-
-export interface UseFSWatcher {
-  readonly watchers: ReadonlyMap<GlobPattern, FileSystemWatcher>
-  readonly onDidCreate: Event<Uri>
-  readonly onDidChange: Event<Uri>
-  readonly onDidDelete: Event<Uri>
-}
 
 /**
  * @reactive `workspace.createFileSystemWatcher`
  */
 export function useFsWatcher(
   globPatterns: MaybeRefOrGetter<GlobPattern | readonly GlobPattern[] | ReadonlySet<GlobPattern>>,
-  ignoreCreateEvents?: MaybeNullableRefOrGetter<boolean>,
-  ignoreChangeEvents?: MaybeNullableRefOrGetter<boolean>,
-  ignoreDeleteEvents?: MaybeNullableRefOrGetter<boolean>,
-): UseFSWatcher {
+  handlers: {
+    onDidCreate?: false | ((ev: Uri) => void)
+    onDidChange?: false | ((ev: Uri) => void)
+    onDidDelete?: false | ((ev: Uri) => void)
+  } = {},
+) {
   const watchers = shallowReactive(new Map<GlobPattern, FileSystemWatcher>())
   const createEmitter = useEventEmitter<Uri>()
   const changeEmitter = useEventEmitter<Uri>()
@@ -49,9 +43,9 @@ export function useFsWatcher(
       if (!watchers.has(pattern)) {
         const w = workspace.createFileSystemWatcher(
           pattern,
-          toValue(ignoreCreateEvents) || false,
-          toValue(ignoreChangeEvents) || false,
-          toValue(ignoreDeleteEvents) || false,
+          handlers.onDidCreate === false,
+          handlers.onDidChange === false,
+          handlers.onDidDelete === false,
         )
         w.onDidCreate(createEmitter.fire)
         w.onDidChange(changeEmitter.fire)
@@ -69,25 +63,32 @@ export function useFsWatcher(
   }
 
   updateWatchers()
-
   watch(patterns, updateWatchers)
-  watch(
-    () => [
-      toValue(ignoreCreateEvents),
-      toValue(ignoreChangeEvents),
-      toValue(ignoreDeleteEvents),
-    ],
-    () => {
-      clearWatchers()
-      updateWatchers()
-    },
-  )
   onScopeDispose(clearWatchers)
+
+  if (typeof handlers.onDidCreate === 'function') {
+    createEmitter.event(handlers.onDidCreate)
+  }
+  if (typeof handlers.onDidChange === 'function') {
+    changeEmitter.event(handlers.onDidChange)
+  }
+  if (typeof handlers.onDidDelete === 'function') {
+    deleteEmitter.event(handlers.onDidDelete)
+  }
 
   return {
     watchers: readonly(watchers),
+    /**
+     * @see {@link FileSystemWatcher.onDidCreate}
+     */
     onDidCreate: createEmitter.event,
+    /**
+     * @see {@link FileSystemWatcher.onDidChange}
+     */
     onDidChange: changeEmitter.event,
+    /**
+     * @see {@link FileSystemWatcher.onDidDelete}
+     */
     onDidDelete: deleteEmitter.event,
   }
 }

@@ -1,5 +1,5 @@
 import type { MaybeRef, MaybeRefOrGetter } from '@reactive-vscode/reactivity'
-import type { InputBoxValidationMessage, QuickInputButton } from 'vscode'
+import type { InputBox, InputBoxValidationMessage, QuickInputButton } from 'vscode'
 import type { QuickInputOptions } from './useQuickInputOptions'
 import { shallowRef, watchEffect } from '@reactive-vscode/reactivity'
 import { window } from 'vscode'
@@ -8,7 +8,7 @@ import { useQuickInputOptions } from './useQuickInputOptions'
 import { useReactiveEvents } from './useReactiveEvents'
 import { useReactiveOptions } from './useReactiveOptions'
 
-export interface InputBoxOptions extends QuickInputOptions {
+export interface InputBoxProps extends QuickInputOptions {
   /**
    * The current input value.
    *
@@ -76,7 +76,7 @@ export interface InputBoxOptions extends QuickInputOptions {
  * @reactive `window.createInputBox`
  */
 export function useInputBox(
-  options: InputBoxOptions = {},
+  options: InputBoxProps = {},
 ) {
   const inputBox = useDisposable(window.createInputBox())
 
@@ -103,6 +103,9 @@ export function useInputBox(
 
   return {
     ...inputBox,
+    /**
+     * @see {@linkcode InputBox.value}
+     */
     value,
   }
 }

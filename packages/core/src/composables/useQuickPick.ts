@@ -1,5 +1,5 @@
 import type { MaybeRef, MaybeRefOrGetter } from '@reactive-vscode/reactivity'
-import type { QuickInputButton, QuickPickItem, QuickPickItemButtonEvent } from 'vscode'
+import type { QuickInputButton, QuickPick, QuickPickItem, QuickPickItemButtonEvent } from 'vscode'
 import type { QuickInputOptions } from './useQuickInputOptions'
 import { shallowRef, watchEffect } from '@reactive-vscode/reactivity'
 import { window } from 'vscode'
@@ -8,7 +8,7 @@ import { useQuickInputOptions } from './useQuickInputOptions'
 import { useReactiveEvents } from './useReactiveEvents'
 import { useReactiveOptions } from './useReactiveOptions'
 
-export interface QuickPickOptions<T extends QuickPickItem> extends QuickInputOptions {
+export interface QuickPickProps<T extends QuickPickItem> extends QuickInputOptions {
   /**
    * The current value of the filter text.
    *
@@ -107,7 +107,7 @@ export interface QuickPickOptions<T extends QuickPickItem> extends QuickInputOpt
  * @reactive `window.createQuickPick`
  */
 export function useQuickPick<T extends QuickPickItem>(
-  options: QuickPickOptions<T> = {},
+  options: QuickPickProps<T> = {},
 ) {
   const quickPick = useDisposable(window.createQuickPick<T>())
 
@@ -152,8 +152,17 @@ export function useQuickPick<T extends QuickPickItem>(
 
   return {
     ...quickPick,
+    /**
+     * @see {@linkcode QuickPick.value}
+     */
     value,
+    /**
+     * @see {@linkcode QuickPick.activeItems}
+     */
     activeItems,
+    /**
+     * @see {@linkcode QuickPick.selectedItems}
+     */
     selectedItems,
   }
 }

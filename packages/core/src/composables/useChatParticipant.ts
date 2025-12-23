@@ -1,14 +1,27 @@
 import type { MaybeRef, MaybeRefOrGetter } from '@reactive-vscode/reactivity'
-import type { ChatFollowupProvider, ChatRequestHandler, IconPath } from 'vscode'
-import { toValue, unref, watch, watchEffect } from '@reactive-vscode/reactivity'
+import type { ChatParticipant, ChatRequestHandler } from 'vscode'
+import type { EventListener } from '../utils'
+import { isRef, unref, watch } from '@reactive-vscode/reactivity'
 import { chat } from 'vscode'
 import { useDisposable } from './useDisposable'
-import { useEvent } from './useEvent'
+import { useReactiveEvents } from './useReactiveEvents'
 import { useReactiveOptions } from './useReactiveOptions'
 
 export interface ChatParticipantOptions {
-  iconPath?: MaybeRefOrGetter<IconPath>
-  followupProvider?: MaybeRefOrGetter<ChatFollowupProvider>
+  /**
+   * @see {@linkcode ChatParticipant.iconPath}
+   */
+  iconPath?: MaybeRefOrGetter<ChatParticipant['iconPath']>
+
+  /**
+   * @see {@linkcode ChatParticipant.followupProvider}
+   */
+  followupProvider?: MaybeRefOrGetter<ChatParticipant['followupProvider']>
+
+  /**
+   * @see {@linkcode ChatParticipant.onDidReceiveFeedback}
+   */
+  onDidReceiveFeedback?: EventListener<ChatParticipant['onDidReceiveFeedback']>
 }
 
 /**
@@ -24,20 +37,18 @@ export function useChatParticipant(
 
   useReactiveOptions(participant, options, [
     'iconPath',
+    'followupProvider',
   ])
 
-  if (options.followupProvider !== undefined) {
-    watchEffect(() => {
-      participant.followupProvider = toValue(options.followupProvider)
+  useReactiveEvents(participant, options, [
+    'onDidReceiveFeedback',
+  ])
+
+  if (isRef(handler)) {
+    watch(handler, (handler) => {
+      participant.requestHandler = handler
     })
   }
 
-  watch(() => unref(handler), (handler) => {
-    participant.requestHandler = handler
-  })
-
-  return {
-    participant,
-    onDidReceiveFeedback: useEvent(participant.onDidReceiveFeedback),
-  }
+  return participant
 }

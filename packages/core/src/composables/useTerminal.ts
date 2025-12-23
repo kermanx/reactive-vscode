@@ -1,12 +1,22 @@
 import type { ComputedRef } from '@reactive-vscode/reactivity'
-import type { ExtensionTerminalOptions, Terminal, TerminalOptions, TerminalState } from 'vscode'
+import type { ExtensionTerminalOptions, Terminal, TerminalOptions, TerminalShellIntegration, TerminalState } from 'vscode'
 import { window } from 'vscode'
 import { useDisposable } from './useDisposable'
+import { useTerminalShellIntegration } from './useTerminalShellIntegration'
 import { useTerminalState } from './useTerminalState'
 
-interface UseTerminalReturn extends Omit<Terminal, 'state' | 'dispose'> {
+interface UseTerminalReturn extends Pick<Terminal, 'sendText' | 'show' | 'hide' | 'dispose'> {
   terminal: Terminal
+
+  /**
+   * @see {@linkcode Terminal.state}
+   */
   state: ComputedRef<TerminalState>
+
+  /**
+   * @see {@linkcode Terminal.shellIntegration}
+   */
+  shellIntegration: ComputedRef<TerminalShellIntegration>
 }
 
 /**
@@ -21,24 +31,11 @@ export function useTerminal(...args: any[]): UseTerminalReturn {
 
   return {
     terminal,
-    get name() {
-      return terminal.name
-    },
-    get processId() {
-      return terminal.processId
-    },
-    get creationOptions() {
-      return terminal.creationOptions
-    },
-    get exitStatus() {
-      return terminal.exitStatus
-    },
-    get shellIntegration() {
-      return terminal.shellIntegration
-    },
+    state: useTerminalState(terminal),
+    shellIntegration: useTerminalShellIntegration(terminal),
     sendText: terminal.sendText.bind(terminal),
     show: terminal.show.bind(terminal),
     hide: terminal.hide.bind(terminal),
-    state: useTerminalState(terminal),
+    dispose: terminal.dispose.bind(terminal),
   }
 }
