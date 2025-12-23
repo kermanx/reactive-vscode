@@ -1,5 +1,5 @@
 import { computed, defineService, useWebviewView } from 'reactive-vscode'
-import { message } from './configs'
+import { configs } from './configs'
 import { calledTimes } from './states'
 
 export const useDemoWebviewView = defineService(() => {
@@ -14,7 +14,7 @@ export const useDemoWebviewView = defineService(() => {
     }
   </script>
   <h1>Webview View</h1>
-  <p>${message.value} for ${calledTimes.value} times</p>
+  <p>${configs.message} for ${calledTimes.value} times</p>
   <p><a href="command:reactive-vscode-demo.helloWorld">Say Hello World</a></p>
   <div style="display:flex; flex-wrap:wrap;">
     <input type="text" placeholder="Greeting Message" />
@@ -32,7 +32,7 @@ export const useDemoWebviewView = defineService(() => {
       },
       onDidReceiveMessage(ev) {
         if (ev.type === 'updateMessage')
-          message.value = ev.message
+          configs.message = ev.message
       },
     },
   )

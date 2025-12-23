@@ -1,6 +1,6 @@
 import { defineExtension, defineLogger, useCommand, useIsDarkTheme, watchEffect } from 'reactive-vscode'
 import { window } from 'vscode'
-import { message } from './configs'
+import { configs } from './configs'
 import { calledTimes } from './states'
 import { useDemoTreeView } from './treeView'
 import { useDemoWebviewView } from './webviewView'
@@ -12,7 +12,7 @@ export = defineExtension(() => {
   logger.show()
 
   useCommand('reactive-vscode-demo.helloWorld', () => {
-    window.showInformationMessage(message.value)
+    window.showInformationMessage(configs.message)
     calledTimes.value++
   })
 

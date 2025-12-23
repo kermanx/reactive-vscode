@@ -1,111 +1,150 @@
-import type { WritableComputedRef } from '@reactive-vscode/reactivity'
-import type { ConfigurationScope, ConfigurationTarget } from 'vscode'
+import type { ConfigurationScope, WorkspaceConfiguration } from 'vscode'
 import type { Nullable } from './types'
-import { computed, shallowRef } from '@reactive-vscode/reactivity'
+import { shallowRef } from '@reactive-vscode/reactivity'
 import { workspace } from 'vscode'
 import { useDisposable } from '../composables'
+import { extensionContext } from './defineExtension'
 import { onActivate } from './onActivate'
 
-export interface ConfigRef<T> extends WritableComputedRef<T> {
-  /**
-   * Write the configuration value to the workspace.
-   *
-   * @see https://code.visualstudio.com/api/references/vscode-api#WorkspaceConfiguration.update
-   */
-  update: (value: T, configurationTarget?: ConfigurationTarget | boolean | null, overrideInLanguage?: boolean) => Promise<void>
-  /**
-   * Set the value without updating the workspace.
-   */
-  set: (value: T) => void
-}
+// declare let _inspectMethod: WorkspaceConfiguration['inspect']
+// type InspectReturn<T> = ReturnType<(typeof _inspectMethod<T>)>
 
-const ConfigTypeSymbol = Symbol('ConfigType')
-export interface ConfigType<T> extends ObjectConstructor {
-  [ConfigTypeSymbol]: T
-}
-type ConfigTypeSingle<T> = typeof String | typeof Number | typeof Boolean | typeof Array | typeof Object | null | ConfigType<T>
-type ConfigTypeRaw<T> = ConfigTypeSingle<T> | ConfigTypeSingle<T>[]
+// type ConfigObjectExtraMethods<C extends object> = {
+//   [K in keyof C]: K extends (string | number)
+//     ? C[K] extends any[]
+//       ? {}
+//       : C[K] extends object
+//         ? ConfigObjectExtraMethods<C[K]>
+//         : {}
+//     : never // Symbol keys are not supported
+// } & {
+//   /**
+//    * Useful when the configuration type is "object".
+//    *
+//    * Instead of accessing child configurations via the proxy, access the raw object.
+//    */
+//   $raw: C
 
-export type ConfigTypeOptions = Record<string, ConfigTypeRaw<any>>
+//   /**
+//    * Write the configuration value to the workspace.
+//    *
+//    * @see https://code.visualstudio.com/api/references/vscode-api#WorkspaceConfiguration.update
+//    */
+//   $update: <K extends keyof C>(key: K, value: C[K], configurationTarget?: ConfigurationTarget | boolean | null, overrideInLanguage?: boolean) => Promise<void>
 
-type ParseConfigType<C extends ConfigTypeRaw<any>>
-  = C extends (infer C1)[] ? (C1 extends ConfigTypeSingle<any> ? ParseConfigType<C1> : never)
-    : C extends ConfigType<infer T> ? T : (
-      C extends typeof String ? string
-        : C extends typeof Number ? number
-          : C extends typeof Boolean ? boolean
-            : C extends typeof Array ? any[]
-              : C extends typeof Object ? Record<string | number, any>
-                : C extends null ? null : never
-    )
+//   /**
+//    * Write the configuration value to the workspace.
+//    *
+//    * @see https://code.visualstudio.com/api/references/vscode-api#WorkspaceConfiguration.update
+//    */
+//   $inspect: <K extends keyof C>(key: K) => InspectReturn<C[K]>
 
-export type ParseConfigTypeOptions<C extends ConfigTypeOptions> = {
-  -readonly [K in keyof C]: ParseConfigType<C[K]>
-}
+// }
 
-type ToConfigRefs<C extends object> = {
-  [K in keyof C]: ConfigRef<C[K]>
-}
+// export type ConfigObject<C extends object> = C & ConfigObjectExtraMethods<C>
 
 /**
  * Define configurations of an extension. See `vscode::workspace.getConfiguration`.
  *
- * You can use this function with [vscode-ext-gen](https://github.com/antfu/vscode-ext-gen).
- *
  * @category lifecycle
  */
-export function defineConfigs<const C extends ConfigTypeOptions>(section: Nullable<string>, configs: C, scope?: Nullable<ConfigurationScope>): ToConfigRefs<ParseConfigTypeOptions<C>>
-export function defineConfigs<C extends object>(section: Nullable<string>, configs: C, scope?: Nullable<ConfigurationScope>): ToConfigRefs<C>
-export function defineConfigs(section: Nullable<string>, configs: object, scope?: Nullable<ConfigurationScope>) {
+export function defineConfigs<C extends object>(section: Nullable<string>, scope?: Nullable<ConfigurationScope>): C & {
+  get: WorkspaceConfiguration['get']
+  has: WorkspaceConfiguration['has']
+  inspect: WorkspaceConfiguration['inspect']
+  update: WorkspaceConfiguration['update']
+} {
   const isTopLevel = !section
-  const workspaceConfig = workspace.getConfiguration(isTopLevel ? undefined : section, scope)
 
-  function createConfigRef<T>(key: string, value: T): ConfigRef<T> {
-    const data = shallowRef(value)
-    const ref = computed({
-      get: () => data.value,
-      set: (value) => {
-        data.value = value
-        workspaceConfig.update(key, value)
-      },
-    }) as ConfigRef<T>
-    ref.update = async (value, configurationTarget, overrideInLanguage) => {
-      await workspaceConfig.update(key, value, configurationTarget, overrideInLanguage)
-      data.value = value
+  const workspaceConfig = shallowRef<WorkspaceConfiguration | null>(null)
+  function updateWorkspaceConfig() {
+    return workspaceConfig.value = workspace.getConfiguration(section ?? undefined, scope)
+  }
+  function getWorkspaceConfig() {
+    if (!extensionContext.value) {
+      throw new Error('Cannot access configs before extension is activated.')
     }
-    ref.set = (value) => {
-      data.value = value
+    if (workspaceConfig.value) {
+      return workspaceConfig.value
     }
-    return ref
+    return updateWorkspaceConfig()
   }
 
-  const configRefs = Object.fromEntries(
-    Object.keys(configs).map((key) => {
-      return [key, createConfigRef(key, workspaceConfig.get(key))]
-    }),
-  )
+  function buildProxy(base: string) {
+    return new Proxy<any>({}, {
+      get(_, key) {
+        const config = getWorkspaceConfig()
+        if (typeof key !== 'string') {
+          throw new TypeError('Symbol keys are not supported in defineConfigs proxy.')
+        }
+
+        if (base === '' && ['get', 'has', 'inspect', 'update'].includes(key)) {
+          return Reflect.get(config, key).bind(config)
+        }
+
+        const v = config.get(base + key)
+        if (v === undefined) {
+          throw new Error(`Configuration key "${section ? `${section}.` : ''}${base + key}" is not defined.`)
+        }
+        if (typeof v !== 'object' || v === null || Array.isArray(v)) {
+          return v
+        }
+        return buildProxy(`${base}${key}.`)
+      },
+      set(_, key, value) {
+        const config = getWorkspaceConfig()
+        if (typeof key !== 'string') {
+          throw new TypeError('Symbol keys are not supported in defineConfigs proxy.')
+        }
+        config.update(base + key, value)
+        return true
+      },
+      apply: notSupported,
+      construct: notSupported,
+      defineProperty(_, property, attributes) {
+        const config = getWorkspaceConfig()
+        return Reflect.defineProperty(config, property, attributes)
+      },
+      deleteProperty(_, p) {
+        const config = getWorkspaceConfig()
+        return Reflect.deleteProperty(config, p)
+      },
+      getOwnPropertyDescriptor(_, p) {
+        const config = getWorkspaceConfig()
+        return Reflect.getOwnPropertyDescriptor(config, p)
+      },
+      getPrototypeOf(_) {
+        const config = getWorkspaceConfig()
+        return Reflect.getPrototypeOf(config)
+      },
+      has(_, p) {
+        const config = getWorkspaceConfig()
+        return Reflect.has(config, p)
+      },
+      isExtensible(_) {
+        const config = getWorkspaceConfig()
+        return Reflect.isExtensible(config)
+      },
+      ownKeys(_) {
+        const config = getWorkspaceConfig()
+        return Reflect.ownKeys(config)
+      },
+      preventExtensions: notSupported,
+      setPrototypeOf: notSupported,
+    })
+  }
 
   onActivate(() => {
-    useDisposable(workspace.onDidChangeConfiguration(
-      isTopLevel
-        ? (e) => {
-            const newWorkspaceConfig = workspace.getConfiguration()
-            for (const key in configs) {
-              if (e.affectsConfiguration(key))
-                configRefs[key].set(newWorkspaceConfig.get(key) as any)
-            }
-          }
-        : (e) => {
-            if (!e.affectsConfiguration(section))
-              return
-            const newWorkspaceConfig = workspace.getConfiguration(section)
-            for (const key in configs) {
-              if (e.affectsConfiguration(`${section}.${key}`))
-                configRefs[key].set(newWorkspaceConfig.get(key) as any)
-            }
-          },
-    ))
+    useDisposable(workspace.onDidChangeConfiguration((e) => {
+      if (isTopLevel || e.affectsConfiguration(section, scope ?? undefined)) {
+        updateWorkspaceConfig()
+      }
+    }))
   })
 
-  return configRefs
+  return buildProxy('')
+}
+
+function notSupported(): never {
+  throw new Error('Not supported')
 }

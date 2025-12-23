@@ -1,11 +1,9 @@
 import { defineConfigs } from 'reactive-vscode'
 
-// Scoped config
-export const { message } = defineConfigs('reactive-vscode-demo', {
-  message: String,
-})
-
-// Top-level config
-export const { 'editor.fontSize': fontSize } = defineConfigs(null, {
-  'editor.fontSize': Number,
-})
+export const configs = defineConfigs<{
+  message: string
+  test: {
+    x: number[]
+    y: object
+  }
+}>('reactive-vscode-demo')
