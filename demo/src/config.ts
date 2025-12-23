@@ -1,6 +1,6 @@
-import { defineConfigs } from 'reactive-vscode'
+import { defineConfig } from 'reactive-vscode'
 
-export const configs = defineConfigs<{
+export const config = defineConfig<{
   message: string
   test: {
     x: number[]

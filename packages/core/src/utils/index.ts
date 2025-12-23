@@ -1,4 +1,4 @@
-export * from './defineConfigs'
+export * from './defineConfig'
 export * from './defineExtension'
 export * from './defineLogger'
 export * from './defineService'

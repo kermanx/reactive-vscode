@@ -6,49 +6,12 @@ import { useDisposable } from '../composables'
 import { extensionContext } from './defineExtension'
 import { onActivate } from './onActivate'
 
-// declare let _inspectMethod: WorkspaceConfiguration['inspect']
-// type InspectReturn<T> = ReturnType<(typeof _inspectMethod<T>)>
-
-// type ConfigObjectExtraMethods<C extends object> = {
-//   [K in keyof C]: K extends (string | number)
-//     ? C[K] extends any[]
-//       ? {}
-//       : C[K] extends object
-//         ? ConfigObjectExtraMethods<C[K]>
-//         : {}
-//     : never // Symbol keys are not supported
-// } & {
-//   /**
-//    * Useful when the configuration type is "object".
-//    *
-//    * Instead of accessing child configurations via the proxy, access the raw object.
-//    */
-//   $raw: C
-
-//   /**
-//    * Write the configuration value to the workspace.
-//    *
-//    * @see https://code.visualstudio.com/api/references/vscode-api#WorkspaceConfiguration.update
-//    */
-//   $update: <K extends keyof C>(key: K, value: C[K], configurationTarget?: ConfigurationTarget | boolean | null, overrideInLanguage?: boolean) => Promise<void>
-
-//   /**
-//    * Write the configuration value to the workspace.
-//    *
-//    * @see https://code.visualstudio.com/api/references/vscode-api#WorkspaceConfiguration.update
-//    */
-//   $inspect: <K extends keyof C>(key: K) => InspectReturn<C[K]>
-
-// }
-
-// export type ConfigObject<C extends object> = C & ConfigObjectExtraMethods<C>
-
 /**
  * Define configurations of an extension. See `vscode::workspace.getConfiguration`.
  *
  * @category lifecycle
  */
-export function defineConfigs<C extends object>(section: Nullable<string>, scope?: Nullable<ConfigurationScope>): C & {
+export function defineConfig<C extends object>(section: Nullable<string>, scope?: Nullable<ConfigurationScope>): C & {
   get: WorkspaceConfiguration['get']
   has: WorkspaceConfiguration['has']
   inspect: WorkspaceConfiguration['inspect']
@@ -62,7 +25,7 @@ export function defineConfigs<C extends object>(section: Nullable<string>, scope
   }
   function getWorkspaceConfig() {
     if (!extensionContext.value) {
-      throw new Error('Cannot access configs before extension is activated.')
+      throw new Error('Cannot access config before extension is activated.')
     }
     if (workspaceConfig.value) {
       return workspaceConfig.value
@@ -75,7 +38,7 @@ export function defineConfigs<C extends object>(section: Nullable<string>, scope
       get(_, key) {
         const config = getWorkspaceConfig()
         if (typeof key !== 'string') {
-          throw new TypeError('Symbol keys are not supported in defineConfigs proxy.')
+          throw new TypeError('Symbol keys are not supported in defineConfig proxy.')
         }
 
         if (base === '' && ['get', 'has', 'inspect', 'update'].includes(key)) {
@@ -94,7 +57,7 @@ export function defineConfigs<C extends object>(section: Nullable<string>, scope
       set(_, key, value) {
         const config = getWorkspaceConfig()
         if (typeof key !== 'string') {
-          throw new TypeError('Symbol keys are not supported in defineConfigs proxy.')
+          throw new TypeError('Symbol keys are not supported in defineConfig proxy.')
         }
         config.update(base + key, value)
         return true
