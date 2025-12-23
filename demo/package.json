@@ -30,14 +30,6 @@
           "type": "string",
           "default": "Hello World",
           "description": "The message to show in the notification"
-        },
-        "reactive-vscode-demo.test.x": {
-          "type": "array",
-          "description": "The message to show in the notification"
-        },
-        "reactive-vscode-demo.test.y": {
-          "type": "object",
-          "description": "The message to show in the notification"
         }
       }
     },
