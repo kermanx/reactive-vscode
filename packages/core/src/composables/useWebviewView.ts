@@ -1,18 +1,45 @@
 import type { MaybeRefOrGetter } from '@reactive-vscode/reactivity'
-import type { ViewBadge, WebviewOptions, WebviewView, WebviewViewResolveContext } from 'vscode'
-import { ref, shallowRef, toValue, watchEffect } from '@reactive-vscode/reactivity'
+import type { Uri, Webview, WebviewOptions, WebviewView, WebviewViewResolveContext } from 'vscode'
+import type { EventListener } from '../utils'
+import { computed, shallowRef, toValue, watchEffect } from '@reactive-vscode/reactivity'
 import { window } from 'vscode'
-import { createKeyedComposable } from '../utils'
 import { useDisposable } from './useDisposable'
-import { useViewBadge } from './useViewBadge'
-import { useViewTitle } from './useViewTitle'
+import { useReactiveEvents } from './useReactiveEvents'
+import { useReactiveOptions } from './useReactiveOptions'
+import { useViewVisibility } from './useViewVisibility'
 
-export interface WebviewViewRegisterOptions {
-  retainContextWhenHidden?: boolean
-  onDidReceiveMessage?: (message: any) => void
+type WebviewCreationOptions = (Parameters<typeof window.registerWebviewViewProvider>[2] & {})['webviewOptions'] & {}
+
+export interface WebviewViewProps extends WebviewCreationOptions {
+  /**
+   * @see {@linkcode WebviewView.title}
+   */
+  title?: MaybeRefOrGetter<WebviewView['title']>
+
+  /**
+   * @see {@linkcode WebviewView.description}
+   */
+  description?: MaybeRefOrGetter<WebviewView['description']>
+
+  /**
+   * @see {@linkcode WebviewView.badge}
+   */
+  badge?: MaybeRefOrGetter<WebviewView['badge']>
+
+  /**
+   * @see {@linkcode WebviewViewOptions.onDidDispose}
+   */
+  onDidDispose?: EventListener<WebviewView['onDidDispose']>
+
+  /**
+   * @see {@linkcode Webview.options}
+   */
   webviewOptions?: MaybeRefOrGetter<WebviewOptions>
-  title?: MaybeRefOrGetter<string | undefined>
-  badge?: MaybeRefOrGetter<ViewBadge | undefined>
+
+  /**
+   * @see {@linkcode Webview.onDidReceiveMessage}
+   */
+  onDidReceiveMessage?: EventListener<Webview['onDidReceiveMessage']>
 }
 
 /**
@@ -20,61 +47,83 @@ export interface WebviewViewRegisterOptions {
  *
  * @category view
  */
-export const useWebviewView = createKeyedComposable(
-  (
-    viewId: string,
-    html: MaybeRefOrGetter<string>,
-    options?: WebviewViewRegisterOptions,
-  ) => {
-    const view = shallowRef<WebviewView>()
-    const context = shallowRef<WebviewViewResolveContext>()
-    useDisposable(window.registerWebviewViewProvider(
-      viewId,
-      {
-        resolveWebviewView(viewArg, contextArg) {
-          view.value = viewArg
-          context.value = contextArg
-          if (options?.onDidReceiveMessage)
-            viewArg.webview.onDidReceiveMessage(options.onDidReceiveMessage)
-        },
+export function useWebviewView(
+  viewId: string,
+  html: MaybeRefOrGetter<string>,
+  options: WebviewViewProps = {},
+) {
+  const view = shallowRef<WebviewView>()
+  const webview = computed(() => view.value?.webview)
+  const context = shallowRef<WebviewViewResolveContext>()
+  useDisposable(window.registerWebviewViewProvider(
+    viewId,
+    {
+      resolveWebviewView(viewArg, contextArg) {
+        view.value = viewArg
+        context.value = contextArg
       },
-      {
-        webviewOptions: {
-          retainContextWhenHidden: options?.retainContextWhenHidden,
-        },
+    },
+    {
+      webviewOptions: {
+        retainContextWhenHidden: options.retainContextWhenHidden,
       },
-    ))
+    },
+  ))
 
-    const forceRefreshId = ref(0)
-
-    function forceRefresh() {
-      forceRefreshId.value++
+  const forceReloadId = shallowRef(0)
+  watchEffect(() => {
+    if (view.value) {
+      view.value.webview.html = `${toValue(html)}<!--${forceReloadId.value}-->`
     }
+  })
 
-    watchEffect(() => {
-      if (view.value)
-        view.value.webview.html = `${toValue(html)}<!--${forceRefreshId.value}-->`
-    })
+  useReactiveOptions(view, options, [
+    'title',
+    'description',
+    'badge',
+  ])
 
-    if (options?.webviewOptions) {
-      const webviewOptions = options.webviewOptions
-      watchEffect(() => {
-        if (view.value)
-          view.value.webview.options = toValue(webviewOptions)
-      })
-    }
+  useReactiveEvents(view, options, [
+    'onDidDispose',
+  ])
 
-    if (options?.title)
-      useViewTitle(view, options.title)
+  useReactiveOptions(webview, { options: options.webviewOptions }, [
+    'options',
+  ])
 
-    if (options?.badge)
-      useViewBadge(view, options.badge)
+  useReactiveEvents(webview, options, [
+    'onDidReceiveMessage',
+  ])
 
-    function postMessage(message: any) {
-      return view.value?.webview.postMessage(message)
-    }
-
-    return { view, context, postMessage, forceRefresh }
-  },
-  viewId => viewId,
-)
+  return {
+    view: computed(() => view.value),
+    /**
+     * @see {@linkcode WebviewView.webview}
+     */
+    webview,
+    /**
+     * Additional metadata about the view being resolved.
+     */
+    context: computed(() => context.value),
+    /**
+     * @see {@linkcode WebviewView.visible}
+     */
+    visible: useViewVisibility(view),
+    /**
+     * @see {@linkcode WebviewView.show}
+     */
+    show: (preserveFocus?: boolean) => view.value?.show(preserveFocus),
+    /**
+     * @see {@linkcode Webview.postMessage}
+     */
+    postMessage: (message: any) => view.value?.webview.postMessage(message),
+    /**
+     * @see {@linkcode Webview.asWebviewUri}
+     */
+    asWebviewUri: (resource: Uri) => webview.value?.asWebviewUri(resource),
+    /**
+     * Force reload the webview content.
+     */
+    forceReload: () => { forceReloadId.value++ },
+  }
+}

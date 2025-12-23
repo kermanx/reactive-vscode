@@ -1,12 +1,12 @@
 import { computed, shallowRef } from '@reactive-vscode/reactivity'
 import { debug } from 'vscode'
-import { createSingletonComposable } from '../utils'
+import { defineService } from '../utils'
 import { useDisposable } from './useDisposable'
 
 /**
  * @reactive `debug.activeDebugSession`
  */
-export const useActiveDebugSession = createSingletonComposable(() => {
+export const useActiveDebugSession = defineService(() => {
   const session = shallowRef(debug.activeDebugSession)
 
   useDisposable(debug.onDidChangeActiveDebugSession((ev) => {

@@ -1,9 +1,9 @@
-import { defineExtension, reactive, useCommands, useFsWatcher } from 'reactive-vscode'
+import { defineExtension, reactive, useCommands, useFileSystemWatcher } from 'reactive-vscode'
 import { window } from 'vscode'
 
 export = defineExtension(() => {
   const globs = reactive(new Set(['src/**/*', 'docs/**/*']))
-  const watcher = useFsWatcher(globs)
+  const watcher = useFileSystemWatcher(globs)
   watcher.onDidChange(uri => window.showInformationMessage(`File changed: ${uri}`))
 
   useCommands({

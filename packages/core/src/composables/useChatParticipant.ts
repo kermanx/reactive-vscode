@@ -1,43 +1,54 @@
 import type { MaybeRef, MaybeRefOrGetter } from '@reactive-vscode/reactivity'
-import type { ChatFollowupProvider, ChatRequestHandler, IconPath } from 'vscode'
-import { unref, watchEffect } from '@reactive-vscode/reactivity'
+import type { ChatParticipant, ChatRequestHandler } from 'vscode'
+import type { EventListener } from '../utils'
+import { isRef, unref, watch } from '@reactive-vscode/reactivity'
 import { chat } from 'vscode'
-import { createKeyedComposable } from '../utils'
 import { useDisposable } from './useDisposable'
-import { useEvent } from './useEvent'
+import { useReactiveEvents } from './useReactiveEvents'
 import { useReactiveOptions } from './useReactiveOptions'
 
 export interface ChatParticipantOptions {
-  iconPath?: MaybeRefOrGetter<IconPath>
-  followupProvider?: MaybeRef<ChatFollowupProvider>
+  /**
+   * @see {@linkcode ChatParticipant.iconPath}
+   */
+  iconPath?: MaybeRefOrGetter<ChatParticipant['iconPath']>
+
+  /**
+   * @see {@linkcode ChatParticipant.followupProvider}
+   */
+  followupProvider?: MaybeRefOrGetter<ChatParticipant['followupProvider']>
+
+  /**
+   * @see {@linkcode ChatParticipant.onDidReceiveFeedback}
+   */
+  onDidReceiveFeedback?: EventListener<ChatParticipant['onDidReceiveFeedback']>
 }
 
 /**
  * @reactive `chat.createChatParticipant`
  * @category chat
  */
-export const useChatParticipant = createKeyedComposable((
+export function useChatParticipant(
   id: string,
   handler: MaybeRef<ChatRequestHandler>,
   options: ChatParticipantOptions = {},
-) => {
+) {
   const participant = useDisposable(chat.createChatParticipant(id, unref(handler)))
 
   useReactiveOptions(participant, options, [
     'iconPath',
+    'followupProvider',
   ])
 
-  if (options.followupProvider !== undefined) {
-    watchEffect(() => {
-      participant.followupProvider = unref(options.followupProvider)
+  useReactiveEvents(participant, options, [
+    'onDidReceiveFeedback',
+  ])
+
+  if (isRef(handler)) {
+    watch(handler, (handler) => {
+      participant.requestHandler = handler
     })
   }
 
-  watchEffect(() => {
-    participant.requestHandler = unref(handler)
-  })
-
-  return {
-    onDidReceiveFeedback: useEvent(participant.onDidReceiveFeedback),
-  }
-}, id => id)
+  return participant
+}

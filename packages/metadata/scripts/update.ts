@@ -56,6 +56,7 @@ async function getComposableMetadata(filename: string): Promise<FunctionMetadata
     lastUpdated: +await git.raw(['log', '-1', '--format=%at', tsPath]) * 1000,
     description,
     deprecated: ts.includes('@deprecated') || (description?.includes('DEPRECATED') ?? false),
+    internal: ts.includes('@internal'),
     isComposable: true,
   }
 }
@@ -76,6 +77,7 @@ async function getUtilMetadata(filename: string): Promise<FunctionMetadata | und
     lastUpdated: +await git.raw(['log', '-1', '--format=%at', tsPath]) * 1000,
     description,
     deprecated: ts.includes('@deprecated') || (description?.includes('DEPRECATED') ?? false),
+    internal: ts.includes('@internal'),
     isComposable: false,
   }
 }

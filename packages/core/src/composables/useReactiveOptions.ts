@@ -1,22 +1,25 @@
 import type { MaybeRefOrGetter } from '@reactive-vscode/reactivity'
+import type { MaybeNullableRefOrGetter } from '../utils'
 import { toValue, watchEffect } from '@reactive-vscode/reactivity'
 
 /**
- * Set multiple reactive options on a target object.
- * @category utilities
+ * @internal
  */
-export function useReactiveOptions<T extends object>(
-  target: T,
+export function useReactiveOptions<T extends object, const K extends keyof T>(
+  target: MaybeNullableRefOrGetter<T>,
   options: {
-    [K in keyof T]?: MaybeRefOrGetter<T[K]>;
+    [k in K]?: MaybeRefOrGetter<T[k]>;
   },
-  keys: (keyof T)[],
+  keys: readonly K[],
 ) {
   for (const key of keys) {
     const value = options[key]
     if (value !== undefined) {
       watchEffect(() => {
-        target[key] = toValue(value) as any
+        const t = toValue(target)
+        if (t != null) {
+          t[key] = toValue(value) as any
+        }
       })
     }
   }

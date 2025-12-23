@@ -1,15 +1,42 @@
 import type { MaybeRefOrGetter } from '@reactive-vscode/reactivity'
-import type { WebviewOptions } from 'vscode'
-import { ref, shallowRef, toValue, watchEffect } from '@reactive-vscode/reactivity'
+import type { Webview, WebviewOptions, WebviewPanel, WebviewPanelOptions } from 'vscode'
+import type { EventListener } from '../utils'
+import { computed, shallowRef, toValue, watchEffect } from '@reactive-vscode/reactivity'
 import { window } from 'vscode'
 import { useDisposable } from './useDisposable'
-import { useViewTitle } from './useViewTitle'
+import { useReactiveEvents } from './useReactiveEvents'
+import { useReactiveOptions } from './useReactiveOptions'
 
-export interface WebviewPanelRegisterOptions {
-  enableFindWidget?: boolean
-  retainContextWhenHidden?: boolean
-  onDidReceiveMessage?: (message: any) => void
+export interface WebviewPanelProps extends WebviewPanelOptions, WebviewOptions {
+  /**
+   * @see {@linkcode WebviewPanel.title}
+   */
+  title?: MaybeRefOrGetter<WebviewPanel['title']>
+
+  /**
+   * @see {@linkcode WebviewPanel.iconPath}
+   */
+  iconPath?: MaybeRefOrGetter<WebviewPanel['iconPath']>
+
+  /**
+   * @see {@linkcode WebviewPanel.onDidChangeViewState}
+   */
+  onDidChangeViewState?: EventListener<WebviewPanel['onDidChangeViewState']>
+
+  /**
+   * @see {@linkcode WebviewPanel.onDidDispose}
+   */
+  onDidDispose?: EventListener<WebviewPanel['onDidDispose']>
+
+  /**
+   * @see {@linkcode Webview.options}
+   */
   webviewOptions?: MaybeRefOrGetter<WebviewOptions>
+
+  /**
+   * @see {@linkcode Webview.onDidReceiveMessage}
+   */
+  onDidReceiveMessage?: EventListener<Webview['onDidReceiveMessage']>
 }
 
 /**
@@ -22,52 +49,80 @@ export function useWebviewPanel(
   title: MaybeRefOrGetter<string>,
   html: MaybeRefOrGetter<string>,
   showOptions: Parameters<typeof window.createWebviewPanel>[2],
-  options?: WebviewPanelRegisterOptions,
+  options: WebviewPanelProps = {},
 ) {
-  const context = shallowRef<unknown>()
   const panel = useDisposable(window.createWebviewPanel(
     viewType,
     toValue(title),
     showOptions,
-    {
-      enableFindWidget: options?.enableFindWidget,
-      retainContextWhenHidden: options?.retainContextWhenHidden,
-      ...toValue(options?.webviewOptions),
-    },
+    options,
   ))
+  const webview = panel.webview
 
-  if (options?.onDidReceiveMessage)
-    panel.webview.onDidReceiveMessage(options.onDidReceiveMessage)
+  useReactiveOptions(panel, options, [
+    'title',
+    'iconPath',
+  ])
 
-  const forceRefreshId = ref(0)
+  useReactiveEvents(panel, options, [
+    'onDidChangeViewState',
+    'onDidDispose',
+  ])
 
-  function forceRefresh() {
-    forceRefreshId.value++
-  }
-
+  const forceReload = shallowRef(0)
   watchEffect(() => {
-    panel.webview.html = `${toValue(html)}<!--${forceRefreshId.value}-->`
+    webview.html = `${toValue(html)}<!--${forceReload.value}-->`
   })
 
-  if (options?.webviewOptions) {
-    const webviewOptions = options.webviewOptions
-    watchEffect(() => {
-      panel.webview.options = toValue(webviewOptions)
-    })
-  }
+  useReactiveOptions(webview, { options: options.webviewOptions }, [
+    'options',
+  ])
 
-  useViewTitle(panel, title)
+  useReactiveEvents(webview, options, [
+    'onDidReceiveMessage',
+  ])
 
-  function postMessage(message: any) {
-    return panel.webview.postMessage(message)
-  }
-
-  const active = ref(panel.active)
-  const visible = ref(panel.visible)
-  useDisposable(panel.onDidChangeViewState(() => {
-    active.value = panel.active
-    visible.value = panel.visible
+  const viewColumn = shallowRef(panel.viewColumn)
+  const active = shallowRef(panel.active)
+  const visible = shallowRef(panel.visible)
+  useDisposable(panel.onDidChangeViewState((ev) => {
+    if (panel === ev.webviewPanel) {
+      viewColumn.value = panel.viewColumn
+      active.value = panel.active
+      visible.value = panel.visible
+    }
   }))
 
-  return { panel, context, active, visible, postMessage, forceRefresh }
+  return {
+    panel,
+    webview,
+    /**
+     * @see {@linkcode WebviewPanel.viewColumn}
+     */
+    viewColumn: computed(() => viewColumn.value),
+    /**
+     * @see {@linkcode WebviewPanel.active}
+     */
+    active: computed(() => active.value),
+    /**
+     * @see {@linkcode WebviewPanel.visible}
+     */
+    visible: computed(() => visible.value),
+    /**
+     * @see {@linkcode WebviewPanel.reveal}
+     */
+    reveal: panel.reveal.bind(panel),
+    /**
+     * @see {@linkcode Webview.postMessage}
+     */
+    postMessage: webview.postMessage.bind(webview),
+    /**
+     * @see {@linkcode Webview.asWebviewUri}
+     */
+    asWebviewUri: webview.asWebviewUri.bind(webview),
+    /**
+     * Force reload the webview content.
+     */
+    forceReload: () => { forceReload.value++ },
+  }
 }

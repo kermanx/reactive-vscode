@@ -1,12 +1,12 @@
 import { computed, shallowRef } from '@reactive-vscode/reactivity'
 import { env } from 'vscode'
-import { createSingletonComposable } from '../utils'
+import { defineService } from '../utils'
 import { useDisposable } from './useDisposable'
 
 /**
  * @reactive `env.shell`
  */
-export const useDefaultShell = createSingletonComposable(() => {
+export const useEnvShell = defineService(() => {
   const defaultShell = shallowRef(env.shell)
 
   useDisposable(env.onDidChangeShell((ev) => {

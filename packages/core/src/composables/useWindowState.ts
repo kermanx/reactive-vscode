@@ -1,12 +1,12 @@
 import { computed, shallowRef } from '@reactive-vscode/reactivity'
 import { window } from 'vscode'
-import { createSingletonComposable } from '../utils'
+import { defineService } from '../utils'
 import { useDisposable } from './useDisposable'
 
 /**
  * @reactive `window.state`
  */
-export const useWindowState = createSingletonComposable(() => {
+export const useWindowState = defineService(() => {
   const windowState = shallowRef(window.state)
 
   useDisposable(window.onDidChangeWindowState((ev) => {

@@ -47,7 +47,7 @@ export function createMockWindow(_context: MockVscode) {
 
     async showTextDocument(document: vscode.TextDocument, column?: vscode.ViewColumn, preserveFocus?: boolean): Promise<vscode.TextEditor>
     async showTextDocument(document: vscode.TextDocument, options?: vscode.TextDocumentShowOptions): Promise<vscode.TextEditor>
-    async showTextDocument(uri: vscode.Uri, options?: vscode. TextDocumentShowOptions): Promise<vscode.TextEditor>
+    async showTextDocument(uri: vscode.Uri, options?: vscode.TextDocumentShowOptions): Promise<vscode.TextEditor>
     async showTextDocument(docOrUri: vscode.TextDocument | vscode.Uri, columnOrOptions?: vscode.ViewColumn | vscode.TextDocumentShowOptions, _preserveFocus?: boolean): Promise<vscode.TextEditor> {
       const document = docOrUri instanceof TextDocument ? docOrUri : await _context.workspace.openTextDocument(docOrUri as vscode.Uri)
       let editor = this._visibleTextEditors.value.find(editor => editor.document === document)

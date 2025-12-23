@@ -1,12 +1,12 @@
 import { computed, shallowRef } from '@reactive-vscode/reactivity'
 import { tasks } from 'vscode'
-import { createSingletonComposable } from '../utils'
+import { defineService } from '../utils'
 import { useDisposable } from './useDisposable'
 
 /**
  * @reactive `tasks.taskExecutions`
  */
-export const useTaskExecutions = createSingletonComposable(() => {
+export const useTaskExecutions = defineService(() => {
   const taskExecutions = shallowRef(tasks.taskExecutions)
 
   function update() {

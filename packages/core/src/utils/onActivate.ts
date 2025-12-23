@@ -14,8 +14,10 @@ export const activateCbs: OnActivateCb[] = []
  * @category lifecycle
  */
 export function onActivate(fn: OnActivateCb) {
-  if (extensionContext.value)
+  if (extensionContext.value) {
     fn(extensionContext.value)
-  else
+  }
+  else {
     activateCbs.push(fn)
+  }
 }

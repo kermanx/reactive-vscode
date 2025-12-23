@@ -12,34 +12,12 @@ import { defineExtension, useTerminal } from 'reactive-vscode'
 export = defineExtension(() => {
   const {
     terminal,
-    name,
-    processId,
-    creationOptions,
-    exitStatus,
+    state,
+    shellIntegration,
     sendText,
     show,
     hide,
-    state,
   } = useTerminal('My Terminal', '/bin/bash')
-})
-```
-
-## Create a Controlled Terminal
-
-`reactive::useControlledTerminal` creates a terminal which allows you to control its lifecycle. The params are the same as `vscode::window.createTerminal`.
-
-```ts
-import { defineExtension, useControlledTerminal } from 'reactive-vscode'
-
-export = defineExtension(() => {
-  const {
-    terminal,
-    getIsActive,
-    show,
-    sendText,
-    close,
-    state,
-  } = useControlledTerminal('My Terminal', '/bin/bash')
 })
 ```
 

@@ -1,18 +1,24 @@
 import type { MaybeRef, MaybeRefOrGetter } from '@reactive-vscode/reactivity'
 import type { DecorationOptions, DecorationRenderOptions, Disposable, Range, TextEditor, TextEditorDecorationType } from 'vscode'
-import type { Awaitable, Nullable } from '../utils/types'
-import { computed, toValue, watch, watchEffect } from '@reactive-vscode/reactivity'
-import { window } from 'vscode'
+import type { Awaitable, MaybeNullableRefOrGetter } from '../utils/types'
+import { computed, onScopeDispose, toValue, unref } from '@reactive-vscode/reactivity'
+import { window, workspace } from 'vscode'
 import { useDisposable } from './useDisposable'
-import { useDocumentText } from './useDocumentText'
 
 export interface UseEditorDecorationsOptions {
   /**
    * The triggers to update the decorations.
    *
-   * @default ['effect', 'documentChanged']
+   * @default true
    */
-  updateOn?: ('effect' | 'documentChanged')[]
+  watchDocumentChange?: boolean
+
+  /**
+   * Immediately trigger an update.
+   *
+   * @default true
+   */
+  immediate?: boolean
 }
 
 /**
@@ -21,31 +27,28 @@ export interface UseEditorDecorationsOptions {
  * @category editor
  */
 export function useEditorDecorations(
-  editor: MaybeRefOrGetter<Nullable<TextEditor>>,
+  editor: MaybeNullableRefOrGetter<TextEditor>,
   decorationTypeOrOptions: MaybeRefOrGetter<TextEditorDecorationType | DecorationRenderOptions>,
   decorations:
     | MaybeRef<readonly Range[] | readonly DecorationOptions[]>
     | ((editor: TextEditor) => Awaitable<readonly Range[] | readonly DecorationOptions[]>),
   options: UseEditorDecorationsOptions = {},
 ) {
-  const {
-    updateOn = ['effect', 'documentChanged'],
-  } = options
-
   let decorationTypeDisposable: Disposable | undefined
-  const decorationType = computed<TextEditorDecorationType>(
-    () => {
-      decorationTypeDisposable?.dispose()
-      decorationTypeDisposable = undefined
+  const decorationType = computed<TextEditorDecorationType>(() => {
+    decorationTypeDisposable?.dispose()
+    decorationTypeDisposable = undefined
 
-      const decorationTypeOrOptionsValue = toValue(decorationTypeOrOptions)
-      if ('key' in decorationTypeOrOptionsValue)
-        return decorationTypeOrOptionsValue
-      const decoration = window.createTextEditorDecorationType(decorationTypeOrOptionsValue)
-      decorationTypeDisposable = useDisposable(decoration)
-      return decoration
-    },
-  )
+    const decorationTypeOrOptionsValue = toValue(decorationTypeOrOptions)
+    if ('key' in decorationTypeOrOptionsValue) {
+      return decorationTypeOrOptionsValue
+    }
+
+    const decoration = window.createTextEditorDecorationType(decorationTypeOrOptionsValue)
+    decorationTypeDisposable = decoration
+    return decoration
+  })
+  onScopeDispose(() => decorationTypeDisposable?.dispose())
 
   const update = async () => {
     const editorValue = toValue(editor)
@@ -56,22 +59,20 @@ export function useEditorDecorations(
       decorationType.value,
       typeof decorations === 'function'
         ? await decorations(editorValue)
-        : toValue(decorations),
+        : unref(decorations),
     )
   }
 
-  const documentText = updateOn.includes('documentChanged')
-    ? useDocumentText(() => toValue(editor)?.document)
-    : null
-
-  if (updateOn.includes('effect')) {
-    watchEffect(async () => {
-      void documentText?.value
-      await update()
-    })
+  if (options.watchDocumentChange ?? true) {
+    useDisposable(workspace.onDidChangeTextDocument(async (ev) => {
+      if (toValue(editor)?.document === ev.document) {
+        await update()
+      }
+    }))
   }
-  else if (documentText) {
-    watch(documentText, update)
+
+  if (options.immediate ?? true) {
+    update()
   }
 
   return {

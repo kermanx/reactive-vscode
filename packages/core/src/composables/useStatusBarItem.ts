@@ -9,13 +9,45 @@ export interface UseStatusBarItemOptions {
   id?: string
   alignment?: StatusBarAlignment
   priority?: number
+
+  /**
+   * @see {@linkcode StatusBarItem.name}
+   */
   name?: MaybeRefOrGetter<StatusBarItem['name']>
+
+  /**
+   * @see {@linkcode StatusBarItem.text}
+   */
   text?: MaybeRefOrGetter<StatusBarItem['text']>
+
+  /**
+   * @see {@linkcode StatusBarItem.tooltip}
+   */
   tooltip?: MaybeRefOrGetter<StatusBarItem['tooltip']>
+
+  /**
+   * @see {@linkcode StatusBarItem.color}
+   */
   color?: MaybeRefOrGetter<StatusBarItem['color']>
+
+  /**
+   * @see {@linkcode StatusBarItem.backgroundColor}
+   */
   backgroundColor?: MaybeRefOrGetter<StatusBarItem['backgroundColor']>
+
+  /**
+   * @see {@linkcode StatusBarItem.command}
+   */
   command?: MaybeRefOrGetter<StatusBarItem['command']>
+
+  /**
+   * @see {@linkcode StatusBarItem.accessibilityInformation}
+   */
   accessibilityInformation?: MaybeRefOrGetter<StatusBarItem['accessibilityInformation']>
+
+  /**
+   * Whether the status bar item is visible
+   */
   visible?: MaybeRefOrGetter<boolean>
 }
 
@@ -46,9 +78,6 @@ export function useStatusBarItem(options: UseStatusBarItemOptions): StatusBarIte
         item.hide()
       }
     })
-  }
-  else {
-    item.show()
   }
 
   return item

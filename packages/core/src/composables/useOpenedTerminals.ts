@@ -1,13 +1,13 @@
 import { shallowRef } from '@reactive-vscode/reactivity'
 import { window } from 'vscode'
-import { createSingletonComposable } from '../utils'
+import { defineService } from '../utils'
 import { useDisposable } from './useDisposable'
 
 /**
  * @reactive `window.terminals`
  * @category terminal
  */
-export const useOpenedTerminals = createSingletonComposable(() => {
+export const useOpenedTerminals = defineService(() => {
   const openedTerminals = shallowRef(window.terminals)
 
   function update() {

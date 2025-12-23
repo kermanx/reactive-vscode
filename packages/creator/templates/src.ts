@@ -1,14 +1,14 @@
 export default (identifier: string, displayName: string) => ({
   extension: `import { defineExtension, useCommand, useIsDarkTheme, watchEffect } from 'reactive-vscode'
 import { window } from 'vscode'
-import { message } from './configs'
+import { config } from './config'
 import { logger } from './utils'
 
 export = defineExtension(() => {
   logger.info('Extension Activated')
 
   useCommand('${identifier}.helloWorld', () => {
-    window.showInformationMessage(message.value)
+    window.showInformationMessage(config.message)
   })
 
   const isDark = useIsDarkTheme()
@@ -17,11 +17,11 @@ export = defineExtension(() => {
   })
 })
 `,
-  configs: `import { defineConfigs } from 'reactive-vscode'
+  config: `import { defineConfig } from 'reactive-vscode'
 
-export const { message } = defineConfigs('${identifier}', {
-  message: 'string',
-})
+export const config = defineConfig<{
+  message: string
+}>('${identifier}')
 `,
   utils: `import { defineLogger } from 'reactive-vscode'
 

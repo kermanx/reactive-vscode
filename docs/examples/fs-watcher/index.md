@@ -7,7 +7,7 @@ outline: false
 Watch a dynamic set of files via the VSCode Watcher API.
 
 <ExampleFunctions :fns="[
-  'useFsWatcher',
+  'useFileSystemWatcher',
   'useCommands',
 ]" />
 

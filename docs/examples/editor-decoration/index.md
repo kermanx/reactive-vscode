@@ -7,8 +7,9 @@ outline: false
 A simple example that adds decorations to the active editor depending on the configuration.
 
 <ExampleFunctions :fns="[
-  'defineConfigs',
-  'useActiveEditorDecorations',
+  'defineConfig',
+  'useActiveTextEditor',
+  'useEditorDecorations',
 ]" />
 
 ::: code-group

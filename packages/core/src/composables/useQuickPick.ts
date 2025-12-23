@@ -1,15 +1,35 @@
-import type { MaybeRefOrGetter } from '@reactive-vscode/reactivity'
-import type { QuickInputButton, QuickPickItem } from 'vscode'
-import { shallowRef, toValue, watchEffect } from '@reactive-vscode/reactivity'
+import type { MaybeRef, MaybeRefOrGetter } from '@reactive-vscode/reactivity'
+import type { QuickInputButton, QuickPick, QuickPickItem, QuickPickItemButtonEvent } from 'vscode'
+import type { QuickInputOptions } from './useQuickInputOptions'
+import { shallowRef, watchEffect } from '@reactive-vscode/reactivity'
 import { window } from 'vscode'
 import { useDisposable } from './useDisposable'
-import { useEvent } from './useEvent'
+import { useQuickInputOptions } from './useQuickInputOptions'
+import { useReactiveEvents } from './useReactiveEvents'
+import { useReactiveOptions } from './useReactiveOptions'
 
-export interface QuickPickOptions<T extends QuickPickItem> {
+export interface QuickPickProps<T extends QuickPickItem> extends QuickInputOptions {
   /**
-   * Items to pick from. This can be read and updated by the extension.
+   * The current value of the filter text.
+   *
+   * If provided as a ref, the value will be kept in sync with the quick pick's value, just like `v-model`.
    */
-  items?: MaybeRefOrGetter<readonly T[]>
+  value?: MaybeRef<string>
+
+  /**
+   * Optional placeholder shown in the filter textbox when no filter has been entered.
+   */
+  placeholder?: MaybeRefOrGetter<string | undefined>
+
+  /**
+   * An event signaling when the value of the filter text has changed.
+   */
+  onDidChangeValue?: (value: string) => void
+
+  /**
+   * An event signaling when the user indicated acceptance of the selected item(s).
+   */
+  onDidAccept?: () => void
 
   /**
    * Buttons for actions in the UI.
@@ -17,46 +37,24 @@ export interface QuickPickOptions<T extends QuickPickItem> {
   buttons?: MaybeRefOrGetter<readonly QuickInputButton[]>
 
   /**
-   * An optional title.
-   */
-  title?: MaybeRefOrGetter<string | undefined>
-
-  /**
-   * An optional current step count.
-   */
-  step?: MaybeRefOrGetter<number | undefined>
-
-  /**
-   * An optional total step count.
-   */
-  totalSteps?: MaybeRefOrGetter<number | undefined>
-
-  /**
-   * If the UI should allow for user input. Defaults to true.
+   * An event signaling when a button was triggered.
    *
-   * Change this to false, e.g., while validating user input or
-   * loading data for the next step in user input.
+   * This event fires for buttons stored in the {@link QuickPick.buttons buttons} array. This event does
+   * not fire for buttons on a {@link QuickPickItem}.
    */
-  enabled?: MaybeRefOrGetter<boolean>
+  onDidTriggerButton?: (button: QuickInputButton) => void
 
   /**
-   * If the UI should show a progress indicator. Defaults to false.
+   * An event signaling when a button in a particular {@link QuickPickItem} was triggered.
    *
-   * Change this to true, e.g., while loading more data or validating
-   * user input.
+   * This event does not fire for buttons in the title bar which are part of {@link QuickPick.buttons buttons}.
    */
-  busy?: MaybeRefOrGetter<boolean>
+  onDidTriggerItemButton?: (event: QuickPickItemButtonEvent<T>) => void
 
   /**
-   * If the UI should stay open even when loosing UI focus. Defaults to false.
-   * This setting is ignored on iPad and is always false.
+   * Items to pick from. This can be read and updated by the extension.
    */
-  ignoreFocusOut?: MaybeRefOrGetter<boolean>
-
-  /**
-   * Optional placeholder shown in the filter textbox when no filter has been entered.
-   */
-  placeholder?: MaybeRefOrGetter<string | undefined>
+  items?: MaybeRefOrGetter<readonly T[]>
 
   /**
    * If multiple items can be selected at the same time. Defaults to false.
@@ -79,19 +77,28 @@ export interface QuickPickOptions<T extends QuickPickItem> {
   keepScrollPosition?: MaybeRefOrGetter<boolean>
 
   /**
-   * Initial value of the filter text.
+   * Items to pick from. This can be read and updated by the extension.
    */
-  value?: string
+  activeItems?: MaybeRef<readonly T[]>
 
   /**
-   * Initial active items. This can be read and updated by the extension.
+   * An event signaling when the active items have changed.
+   *
+   * If provided as a ref, the value will be kept in sync with the quick pick's value, just like `v-model`.
    */
-  activeItems?: readonly T[]
+  onDidChangeActive?: (items: readonly T[]) => void
 
   /**
    * Initial selected items. This can be read and updated by the extension.
    */
-  selectedItems?: readonly T[]
+  selectedItems?: MaybeRef<readonly T[]>
+
+  /**
+   * An event signaling when the selected items have changed.
+   *
+   * If provided as a ref, the value will be kept in sync with the quick pick's value, just like `v-model`.
+   */
+  onDidChangeSelection?: (items: readonly T[]) => void
 }
 
 /**
@@ -100,18 +107,13 @@ export interface QuickPickOptions<T extends QuickPickItem> {
  * @reactive `window.createQuickPick`
  */
 export function useQuickPick<T extends QuickPickItem>(
-  options: QuickPickOptions<T> = {},
+  options: QuickPickProps<T> = {},
 ) {
   const quickPick = useDisposable(window.createQuickPick<T>())
 
-  const onDidChangeActive = useEvent(quickPick.onDidChangeActive)
-  const onDidChangeSelection = useEvent(quickPick.onDidChangeSelection)
-  const onDidAccept = useEvent(quickPick.onDidAccept)
-  const onDidHide = useEvent(quickPick.onDidHide)
-  const onDidTriggerButton = useEvent(quickPick.onDidTriggerButton)
-  const onDidChangeValue = useEvent(quickPick.onDidChangeValue)
+  useQuickInputOptions(quickPick, options)
 
-  ;([
+  useReactiveOptions(quickPick, options, [
     'items',
     'buttons',
     'title',
@@ -125,37 +127,42 @@ export function useQuickPick<T extends QuickPickItem>(
     'matchOnDescription',
     'matchOnDetail',
     'keepScrollPosition',
-  ] as const).forEach((key) => {
-    if (options[key])
-      // @ts-expect-error index signature
-      watchEffect(() => quickPick[key] = toValue(options[key]))
-  })
+  ])
 
-  if (options.value)
-    quickPick.value = options.value
-  const value = shallowRef<string>(quickPick.value)
-  onDidChangeValue(v => value.value = v)
+  useReactiveEvents(quickPick, options, [
+    'onDidChangeValue',
+    'onDidAccept',
+    'onDidTriggerButton',
+    'onDidTriggerItemButton',
+    'onDidChangeActive',
+    'onDidChangeSelection',
+  ])
 
-  if (options.activeItems)
-    quickPick.activeItems = options.activeItems
-  const activeItems = shallowRef<readonly T[]>(quickPick.activeItems)
-  onDidChangeActive(items => activeItems.value = items)
+  const value = shallowRef(options.value ?? quickPick.value)
+  quickPick.onDidChangeValue(v => value.value = v)
+  watchEffect(() => quickPick.value = value.value)
 
-  if (options.selectedItems)
-    quickPick.selectedItems = options.selectedItems
-  const selectedItems = shallowRef<readonly T[]>(quickPick.selectedItems)
-  onDidChangeSelection(items => selectedItems.value = items)
+  const activeItems = shallowRef(options.activeItems ?? quickPick.activeItems)
+  quickPick.onDidChangeActive(items => activeItems.value = items)
+  watchEffect(() => quickPick.activeItems = activeItems.value)
+
+  const selectedItems = shallowRef(options.selectedItems ?? quickPick.selectedItems)
+  quickPick.onDidChangeSelection(items => selectedItems.value = items)
+  watchEffect(() => quickPick.selectedItems = selectedItems.value)
 
   return {
     ...quickPick,
-    onDidChangeActive,
-    onDidChangeSelection,
-    onDidAccept,
-    onDidHide,
-    onDidTriggerButton,
-    onDidChangeValue,
+    /**
+     * @see {@linkcode QuickPick.value}
+     */
     value,
+    /**
+     * @see {@linkcode QuickPick.activeItems}
+     */
     activeItems,
+    /**
+     * @see {@linkcode QuickPick.selectedItems}
+     */
     selectedItems,
   }
 }

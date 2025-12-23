@@ -5,12 +5,12 @@ import { useDisposable } from './useDisposable'
  * @category utilities
  * @reactive `Event`
  */
-export function useEvent<T>(event: Event<T>, listeners?: ((e: T) => any)[]) {
-  const addListener = (listener: (e: T) => any, thisArgs?: any, disposables?: Disposable[]) => {
-    useDisposable(event(listener, thisArgs, disposables))
+export function useEvent<T>(event: Event<T>, listeners?: ((e: T) => any)[]): Event<T> {
+  const wrapped = (listener: (e: T) => any, thisArgs?: any, disposables?: Disposable[]) => {
+    return useDisposable(event(listener, thisArgs, disposables))
   }
 
-  listeners?.forEach(listener => addListener(listener))
+  listeners?.forEach(listener => wrapped(listener))
 
-  return addListener
+  return wrapped
 }

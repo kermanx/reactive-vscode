@@ -1,12 +1,12 @@
 import { computed, shallowRef } from '@reactive-vscode/reactivity'
 import { workspace } from 'vscode'
-import { createSingletonComposable } from '../utils'
+import { defineService } from '../utils'
 import { useDisposable } from './useDisposable'
 
 /**
  * @reactive `workspace.workspaceFolders`
  */
-export const useWorkspaceFolders = createSingletonComposable(() => {
+export const useWorkspaceFolders = defineService(() => {
   const folders = shallowRef(workspace.workspaceFolders)
 
   useDisposable(workspace.onDidChangeWorkspaceFolders(() => {
