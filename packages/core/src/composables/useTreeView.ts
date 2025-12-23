@@ -65,8 +65,7 @@ export type TreeViewProps<T>
     }
 
 /**
- * Register a tree view. See `vscode::window.createTreeView`.
- *
+ * @reactive {@linkcode window.createTreeView}
  * @category view
  */
 export function useTreeView<T extends TreeViewNode>(

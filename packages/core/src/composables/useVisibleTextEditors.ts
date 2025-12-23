@@ -4,7 +4,7 @@ import { defineService } from '../utils'
 import { useDisposable } from './useDisposable'
 
 /**
- * @reactive `window.visibleTextEditors`
+ * @reactive {@linkcode window.visibleTextEditors}
  * @category editor
  */
 export const useVisibleTextEditors = defineService(() => {

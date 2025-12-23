@@ -5,7 +5,7 @@ import { workspace } from 'vscode'
 import { useEventEmitter } from './useEventEmitter'
 
 /**
- * @reactive `workspace.createFileSystemWatcher`
+ * @reactive {@linkcode workspace.createFileSystemWatcher}
  */
 export function useFileSystemWatcher(
   globPatterns: MaybeRefOrGetter<GlobPattern | readonly GlobPattern[] | ReadonlySet<GlobPattern>>,

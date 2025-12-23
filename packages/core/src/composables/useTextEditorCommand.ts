@@ -7,8 +7,7 @@ import { useDisposable } from './useDisposable'
 export type TextEditorCommandCallback = Parameters<typeof commands.registerTextEditorCommand>[1]
 
 /**
- * Register a text editor command. See `vscode::commands.registerTextEditorCommand`.
- *
+ * @reactive {@linkcode commands.registerTextEditorCommand}
  * @category commands
  */
 export function useTextEditorCommand(command: string, callback: MaybeRef<Nullable<TextEditorCommandCallback>>) {

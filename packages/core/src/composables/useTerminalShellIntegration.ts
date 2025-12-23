@@ -6,7 +6,7 @@ import { window } from 'vscode'
 import { useDisposable } from './useDisposable'
 
 /**
- * @reactive `Terminal.shellIntegration`
+ * @reactive {@linkcode Terminal.shellIntegration}
  * @category terminal
  */
 export function useTerminalShellIntegration(terminal: MaybeRefOrGetter<Terminal>): ComputedRef<TerminalShellIntegration>

@@ -6,7 +6,7 @@ import { window } from 'vscode'
 import { useDisposable } from './useDisposable'
 
 /**
- * @reactive `Terminal.state`
+ * @reactive {@linkcode Terminal.state}
  * @category terminal
  */
 export function useTerminalState(terminal: MaybeRefOrGetter<Terminal>): ComputedRef<TerminalState>

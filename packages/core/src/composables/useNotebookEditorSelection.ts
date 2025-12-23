@@ -4,7 +4,7 @@ import { computed } from '@reactive-vscode/reactivity'
 import { useNotebookEditorSelections } from './useNotebookEditorSelections'
 
 /**
- * @reactive `NotebookEditor.selection`
+ * @reactive {@linkcode NotebookEditor.selection}
  * @category editor
  */
 export function useNotebookEditorSelection(notebookEditor: MaybeNullableRefOrGetter<NotebookEditor>) {

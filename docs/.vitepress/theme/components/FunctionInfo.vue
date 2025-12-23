@@ -22,13 +22,14 @@ const link = computed(() => withBase(`/functions\#category=${encodeURIComponent(
       </div>
       <div>{{ lastUpdated }}</div>
     </template>
-    <template v-if="info.original">
+    <template v-if="info.original?.length">
       <div opacity="50">
         Original API
       </div>
       <div>
-        <a class="api-link scope-vscode ml--1" :href="`https://code.visualstudio.com/api/references/vscode-api#${info.original}`" target="_blank">
-          {{ info.original }}
+        <a v-for="original, i in info.original" :key="original" class="api-link scope-vscode ml--1" :href="`https://code.visualstudio.com/api/references/vscode-api#${original}`" target="_blank">
+          {{ original }}
+          <span v-if="i < info.original.length - 1" class="text-black dark:text-white ml--1">, </span>
         </a>
       </div>
     </template>

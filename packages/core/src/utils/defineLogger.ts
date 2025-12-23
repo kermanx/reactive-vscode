@@ -23,6 +23,7 @@ type MethodKey = typeof methods[number]
 /**
  * Define a logger which is usable before activation.
  *
+ * @see {@linkcode window.createOutputChannel}
  * @category view
  */
 export function defineLogger(name: string) {

@@ -1,4 +1,5 @@
 import type { WritableComputedRef } from '@reactive-vscode/reactivity'
+import type { ExtensionContext } from 'vscode'
 import { computed, shallowRef } from '@reactive-vscode/reactivity'
 import { extensionContext } from '../utils'
 import { useDisposable } from './useDisposable'
@@ -22,7 +23,7 @@ export type ExtensionSecretRef = WritableComputedRef<string | null | undefined, 
  * - `null` indicates that the value has not been loaded yet.
  * - `undefined` indicates that there is no value stored for the given key.
  *
- * @reactive `ExtensionContext.secrets`
+ * @reactive {@linkcode ExtensionContext.secrets}
  * @category extension
  */
 export function useExtensionSecret(key: string): ExtensionSecretRef {

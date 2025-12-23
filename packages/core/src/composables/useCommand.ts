@@ -5,8 +5,7 @@ import { commands } from 'vscode'
 import { useDisposable } from './useDisposable'
 
 /**
- * Register a command. See `vscode::commands.registerCommand`.
- *
+ * @reactive {@linkcode commands.registerCommand}
  * @category commands
  */
 export function useCommand(command: string, callback: MaybeRef<Nullable<(...args: any[]) => any>>) {

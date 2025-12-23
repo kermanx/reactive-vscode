@@ -104,7 +104,7 @@ export interface QuickPickProps<T extends QuickPickItem> extends QuickInputOptio
 /**
  * Creates a customizable quick pick UI.
  *
- * @reactive `window.createQuickPick`
+ * @reactive {@linkcode window.createQuickPick}
  */
 export function useQuickPick<T extends QuickPickItem>(
   options: QuickPickProps<T> = {},

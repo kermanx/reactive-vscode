@@ -3,7 +3,7 @@ import { useDisposable } from './useDisposable'
 
 /**
  * @category utilities
- * @reactive `Event`
+ * @reactive {@linkcode Event}
  */
 export function useEvent<T>(event: Event<T>, listeners?: ((e: T) => any)[]): Event<T> {
   const wrapped = (listener: (e: T) => any, thisArgs?: any, disposables?: Disposable[]) => {

@@ -5,7 +5,7 @@ import { window } from 'vscode'
 import { useDisposable } from './useDisposable'
 
 /**
- * @reactive `TextEditor.viewColumn`
+ * @reactive {@linkcode TextEditor.viewColumn}
  * @category editor
  */
 export function useTextEditorViewColumn(textEditor: MaybeNullableRefOrGetter<TextEditor>) {

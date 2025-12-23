@@ -73,7 +73,7 @@ export interface InputBoxProps extends QuickInputOptions {
 }
 
 /**
- * @reactive `window.createInputBox`
+ * @reactive {@linkcode window.createInputBox}
  */
 export function useInputBox(
   options: InputBoxProps = {},

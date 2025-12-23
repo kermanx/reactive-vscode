@@ -18,7 +18,11 @@ const DIR_UTILS = resolve(DIR_SRC, 'utils')
 const git = Git(DIR_ROOT)
 
 function getOriginalAPI(ts: string) {
-  return ts.match(/^ \* @reactive `(\S+?)`/m)?.[1]
+  const match = ts.match(/^ \* @reactive (.*)/m)
+  if (!match)
+    return undefined
+  const apis = match[1].matchAll(/\{@linkcode (.*?)\}/g)
+  return Array.from(apis, m => m[1])
 }
 
 function getCategory(ts: string) {
@@ -47,8 +51,8 @@ async function getComposableMetadata(filename: string): Promise<FunctionMetadata
   const mdPath = `${name}.md`
   const _md = existsSync(mdPath) ? await fs.readFile(mdPath, 'utf-8') : undefined // TODO: md
   const original = getOriginalAPI(ts)
-  const category = getCategory(ts) ?? (original ? toCategoryName(original) : undefined)
-  const description = getDescription(ts) || (original ? `Reactive API for \`vscode::${original}\`.` : undefined)
+  const category = getCategory(ts) ?? (original ? toCategoryName(original[0]) : undefined)
+  const description = getDescription(ts) || (original ? `Reactive API for ${original.map(o => `\`vscode::${o}\``).join(', ')}.` : undefined)
   return {
     name,
     category,

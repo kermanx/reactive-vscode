@@ -6,7 +6,7 @@ import { window } from 'vscode'
 import { useDisposable } from './useDisposable'
 
 /**
- * @reactive `TextEditor.selections`
+ * @reactive {@linkcode TextEditor.selections}
  * @category editor
  */
 export function useTextEditorSelections(textEditor: MaybeNullableRefOrGetter<TextEditor>, acceptKind?: MaybeRefOrGetter<(TextEditorSelectionChangeKind | undefined)[]>) {

@@ -4,7 +4,7 @@ import { defineService } from '../utils'
 import { useDisposable } from './useDisposable'
 
 /**
- * @reactive `extensions.all`
+ * @reactive {@linkcode extensions.all}
  * @category extension
  */
 export const useAllExtensions = defineService(() => {

@@ -5,7 +5,7 @@ import { window } from 'vscode'
 import { useDisposable } from './useDisposable'
 
 /**
- * @reactive `TextEditor.visibleRanges`
+ * @reactive {@linkcode TextEditor.visibleRanges}
  * @category editor
  */
 export function useTextEditorVisibleRanges(textEditor: MaybeNullableRefOrGetter<TextEditor>) {

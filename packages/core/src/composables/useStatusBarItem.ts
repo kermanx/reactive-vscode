@@ -52,7 +52,7 @@ export interface UseStatusBarItemOptions {
 }
 
 /**
- * @reactive `window.createStatusBarItem`
+ * @reactive {@linkcode window.createStatusBarItem}
  */
 export function useStatusBarItem(options: UseStatusBarItemOptions): StatusBarItem {
   const item = useDisposable(options.id

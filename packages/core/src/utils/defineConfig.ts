@@ -7,8 +7,9 @@ import { extensionContext } from './defineExtension'
 import { onActivate } from './onActivate'
 
 /**
- * Define configurations of an extension. See `vscode::workspace.getConfiguration`.
+ * Define configurations of an extension.
  *
+ * @see {@linkcode workspace.getConfiguration}
  * @category lifecycle
  */
 export function defineConfig<C extends object>(section: Nullable<string>, scope?: Nullable<ConfigurationScope>): C & {

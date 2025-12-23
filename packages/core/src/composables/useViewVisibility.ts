@@ -6,8 +6,7 @@ import { computed, isRef, ref, toValue, watch, watchEffect } from '@reactive-vsc
 type ViewWithVisibility = Pick<TreeView<unknown> | WebviewView, 'visible' | 'onDidChangeVisibility'>
 
 /**
- * Reactively get the visibility of a view (`vscode::TreeView` or `vscode::WebviewView`).
- *
+ * @reactive {@linkcode TreeView.visible}, {@linkcode WebviewView.visible}
  * @category view
  */
 export function useViewVisibility(view: MaybeNullableRefOrGetter<ViewWithVisibility>): ComputedRef<boolean> {

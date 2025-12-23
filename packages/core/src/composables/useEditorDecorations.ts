@@ -22,8 +22,9 @@ export interface UseEditorDecorationsOptions {
 }
 
 /**
- * Reactively set decorations on the given editor. See `vscode::TextEditor.setDecorations`.
+ * Reactively set decorations on the given editor.
  *
+ * @see {@linkcode TextEditor.setDecorations}
  * @category editor
  */
 export function useEditorDecorations(

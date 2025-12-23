@@ -4,7 +4,7 @@ import { defineService } from '../utils'
 import { useDisposable } from './useDisposable'
 
 /**
- * @reactive `env.shell`
+ * @reactive {@linkcode env.shell}
  */
 export const useEnvShell = defineService(() => {
   const defaultShell = shallowRef(env.shell)

@@ -3,7 +3,7 @@ import { computed, toRaw, toValue } from '@reactive-vscode/reactivity'
 import { l10n } from 'vscode'
 
 /**
- * @reactive `l10n.t`
+ * @reactive {@linkcode l10n.t}
  */
 export function useL10nText(message: MaybeRefOrGetter<string>, ...args: MaybeRefOrGetter<string | number | boolean>[]): ComputedRef<string>
 export function useL10nText(message: MaybeRefOrGetter<string>, args: MaybeRefOrGetter<Record<string, any>>): ComputedRef<string>

@@ -40,8 +40,7 @@ export interface WebviewPanelProps extends WebviewPanelOptions, WebviewOptions {
 }
 
 /**
- * Register a webview panel. See `vscode::window.createWebviewPanel`.
- *
+ * @reactive {@linkcode window.createWebviewPanel}
  * @category view
  */
 export function useWebviewPanel(

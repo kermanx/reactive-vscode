@@ -4,7 +4,7 @@ import { defineService } from '../utils'
 import { useDisposable } from './useDisposable'
 
 /**
- * @reactive `workspace.workspaceFolders`
+ * @reactive {@linkcode workspace.workspaceFolders}
  */
 export const useWorkspaceFolders = defineService(() => {
   const folders = shallowRef(workspace.workspaceFolders)

@@ -4,7 +4,7 @@ import { defineService } from '../utils'
 import { useDisposable } from './useDisposable'
 
 /**
- * @reactive `env.logLevel`
+ * @reactive {@linkcode env.logLevel}
  */
 export const useLogLevel = defineService(() => {
   const logLevel = shallowRef(env.logLevel)

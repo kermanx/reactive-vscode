@@ -4,7 +4,7 @@ import { defineService } from '../utils'
 import { useDisposable } from './useDisposable'
 
 /**
- * @reactive `debug.activeDebugSession`
+ * @reactive {@linkcode debug.activeDebugSession}
  */
 export const useActiveDebugSession = defineService(() => {
   const session = shallowRef(debug.activeDebugSession)

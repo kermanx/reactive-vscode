@@ -4,7 +4,7 @@ import { defineService } from '../utils'
 import { useDisposable } from './useDisposable'
 
 /**
- * @reactive `window.activeColorTheme`
+ * @reactive {@linkcode window.activeColorTheme}
  */
 export const useActiveColorTheme = defineService(() => {
   const result = shallowRef(window.activeColorTheme)

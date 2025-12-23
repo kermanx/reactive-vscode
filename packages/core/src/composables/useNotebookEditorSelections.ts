@@ -5,7 +5,7 @@ import { window } from 'vscode'
 import { useDisposable } from './useDisposable'
 
 /**
- * @reactive `NotebookEditor.selections`
+ * @reactive {@linkcode NotebookEditor.selections}
  * @category editor
  */
 export function useNotebookEditorSelections(notebookEditor: MaybeNullableRefOrGetter<NotebookEditor>) {

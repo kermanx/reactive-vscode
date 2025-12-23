@@ -4,7 +4,7 @@ import { defineService } from '../utils'
 import { useDisposable } from './useDisposable'
 
 /**
- * @reactive `window.terminals`
+ * @reactive {@linkcode window.terminals}
  * @category terminal
  */
 export const useOpenedTerminals = defineService(() => {

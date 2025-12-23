@@ -21,7 +21,7 @@ interface UseTerminalReturn extends Pick<Terminal, 'sendText' | 'show' | 'hide' 
 
 /**
  * @category terminal
- * @reactive `window.createTerminal()`
+ * @reactive {@linkcode window.createTerminal}
  */
 export function useTerminal(name?: string, shellPath?: string, shellArgs?: readonly string[] | string): UseTerminalReturn
 export function useTerminal(options: TerminalOptions): UseTerminalReturn

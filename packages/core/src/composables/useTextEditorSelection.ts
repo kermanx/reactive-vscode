@@ -5,7 +5,7 @@ import { computed } from '@reactive-vscode/reactivity'
 import { useTextEditorSelections } from './useTextEditorSelections'
 
 /**
- * @reactive `TextEditor.selection`
+ * @reactive {@linkcode TextEditor.selection}
  * @category editor
  */
 export function useTextEditorSelection(textEditor: MaybeNullableRefOrGetter<TextEditor>, acceptKind?: MaybeRefOrGetter<(TextEditorSelectionChangeKind | undefined)[]>) {

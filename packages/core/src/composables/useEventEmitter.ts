@@ -11,7 +11,7 @@ interface UseEventEmitterReturn<T> {
 
 /**
  * @category utilities
- * @reactive `EventEmitter`
+ * @reactive {@linkcode EventEmitter}
  */
 export function useEventEmitter<T>(eventEmitter?: EventEmitter<T>, listeners?: ((e: T) => any)[]): UseEventEmitterReturn<T>
 export function useEventEmitter<T>(listeners: ((e: T) => any)[]): UseEventEmitterReturn<T>

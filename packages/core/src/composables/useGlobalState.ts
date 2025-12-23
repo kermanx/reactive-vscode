@@ -1,10 +1,11 @@
 import type { Ref } from '@reactive-vscode/reactivity'
+import type { ExtensionContext } from 'vscode'
 import type { MementoItemRef } from './useMementoItem'
 import { extensionContext } from '../utils'
 import { useMementoItem } from './useMementoItem'
 
 /**
- * @reactive `ExtensionContext.globalState`
+ * @reactive {@linkcode ExtensionContext.globalState}
  * @category extension
  */
 export function useGlobalState<T>(key: string): MementoItemRef<T>

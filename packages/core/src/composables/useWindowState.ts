@@ -4,7 +4,7 @@ import { defineService } from '../utils'
 import { useDisposable } from './useDisposable'
 
 /**
- * @reactive `window.state`
+ * @reactive {@linkcode window.state}
  */
 export const useWindowState = defineService(() => {
   const windowState = shallowRef(window.state)

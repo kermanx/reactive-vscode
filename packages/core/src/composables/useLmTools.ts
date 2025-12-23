@@ -4,9 +4,7 @@ import { defineService } from '../utils'
 import { useDisposable } from './useDisposable'
 
 /**
- * A list of all available tools that were registered by all extensions using `vscode::lm.registerTool`.
- *
- * @reactive `lm.tools`
+ * @reactive {@linkcode lm.tools}
  * @category lm
  */
 export const useLmTools = defineService(() => {

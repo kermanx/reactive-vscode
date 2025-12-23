@@ -4,7 +4,7 @@ import { defineService } from '../utils'
 import { useDisposable } from './useDisposable'
 
 /**
- * @reactive `env.isTelemetryEnabled`
+ * @reactive {@linkcode env.isTelemetryEnabled}
  */
 export const useIsTelemetryEnabled = defineService(() => {
   const isTelemetryEnabled = shallowRef(env.isTelemetryEnabled)

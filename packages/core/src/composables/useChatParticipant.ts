@@ -25,7 +25,7 @@ export interface ChatParticipantOptions {
 }
 
 /**
- * @reactive `chat.createChatParticipant`
+ * @reactive {@linkcode chat.createChatParticipant}
  * @category chat
  */
 export function useChatParticipant(

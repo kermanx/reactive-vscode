@@ -43,8 +43,7 @@ export interface WebviewViewProps extends WebviewCreationOptions {
 }
 
 /**
- * Register a webview view. See `vscode::window.registerWebviewViewProvider`.
- *
+ * @reactive {@linkcode window.registerWebviewViewProvider}
  * @category view
  */
 export function useWebviewView(

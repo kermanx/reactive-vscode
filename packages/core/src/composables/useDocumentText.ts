@@ -5,7 +5,7 @@ import { workspace } from 'vscode'
 import { useDisposable } from './useDisposable'
 
 /**
- * @reactive `TextDocument.getText`
+ * @reactive {@linkcode TextDocument.getText}
  * @category document
  */
 export function useDocumentText(doc: MaybeNullableRefOrGetter<TextDocument>) {
