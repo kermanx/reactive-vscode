@@ -25,6 +25,7 @@ export default defineConfig({
     }),
   ],
   build: {
+    sourcemap: true,
     lib: {
       entry: 'src/index.ts',
       formats: ['es', 'cjs'],
