@@ -30,11 +30,11 @@
     "prepublishOnly": "npm run build"
   },
   "devDependencies": {
-    "@types/node": "^24.9.2",
+    "@types/node": "^25.0.3",
     "@types/prompts": "^2.4.9",
     "chalk": "^5.6.2",
     "prompts": "^2.4.2",
-    "tsdown": "^0.15.11",
+    "tsdown": "^0.18.2",
     "typescript": "^5.9.3"
   }
 }

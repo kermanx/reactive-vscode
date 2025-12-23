@@ -39,12 +39,12 @@
     "dev": "nodemon -w ../core/src/** -w ./scripts/** -e ts --exec \"nr update\""
   },
   "devDependencies": {
-    "@antfu/ni": "^27.0.1",
+    "@antfu/ni": "^28.0.0",
     "@types/node": "18.x",
     "fast-glob": "^3.3.3",
-    "nodemon": "^3.1.10",
-    "simple-git": "^3.28.0",
-    "tsx": "^4.20.6",
+    "nodemon": "^3.1.11",
+    "simple-git": "^3.30.0",
+    "tsx": "^4.21.0",
     "typescript": "^5.9.3"
   }
 }

@@ -8,7 +8,8 @@ A simple example that adds decorations to the active editor depending on the con
 
 <ExampleFunctions :fns="[
   'defineConfig',
-  'useActiveEditorDecorations',
+  'useActiveTextEditor',
+  'useEditorDecorations',
 ]" />
 
 ::: code-group

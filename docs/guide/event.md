@@ -31,15 +31,15 @@ import { defineExtension, useEventEmitter } from 'reactive-vscode'
 export = defineExtension(() => {
   const myEvent = useEventEmitter<string>([/* optional listenrs */])
 
-  myEvent.addListener((msg) => {
-    console.log(`Received message: ${msg}`)
-  })
-
-  myEvent.fire('Hello, World!')
-
   someVscodeApi({
     onSomeEvent: myEvent.event,
   })
+
+  myEvent.event((msg) => {
+    console.log('Received message:', msg)
+  })
+
+  myEvent.fire('Hello, World!')
 })
 ```
 

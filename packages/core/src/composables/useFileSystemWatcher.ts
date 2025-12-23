@@ -7,7 +7,7 @@ import { useEventEmitter } from './useEventEmitter'
 /**
  * @reactive `workspace.createFileSystemWatcher`
  */
-export function useFsWatcher(
+export function useFileSystemWatcher(
   globPatterns: MaybeRefOrGetter<GlobPattern | readonly GlobPattern[] | ReadonlySet<GlobPattern>>,
   handlers: {
     onDidCreate?: false | ((ev: Uri) => void)

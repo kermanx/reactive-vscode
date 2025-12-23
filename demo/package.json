@@ -30,6 +30,14 @@
           "type": "string",
           "default": "Hello World",
           "description": "The message to show in the notification"
+        },
+        "reactive-vscode-demo.test.x": {
+          "type": "array",
+          "description": "The message to show in the notification"
+        },
+        "reactive-vscode-demo.test.y": {
+          "type": "object",
+          "description": "The message to show in the notification"
         }
       }
     },
@@ -65,11 +73,11 @@
   "devDependencies": {
     "@reactive-vscode/mock": "workspace:*",
     "@types/node": "22.x",
-    "@types/vscode": "^1.105.0",
+    "@types/vscode": "^1.107.0",
     "reactive-vscode": "workspace:*",
-    "tsdown": "^0.15.11",
+    "tsdown": "^0.18.2",
     "typescript": "^5.9.3",
-    "vite": "^7.1.12",
-    "vitest": "^4.0.4"
+    "vite": "^7.3.0",
+    "vitest": "^4.0.16"
   }
 }
