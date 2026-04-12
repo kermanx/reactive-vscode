@@ -102,7 +102,7 @@ export function useInputBox(
   watchEffect(() => inputBox.value = value.value)
 
   return {
-    ...inputBox,
+    inputBox,
     /**
      * @see {@linkcode InputBox.value}
      */

@@ -151,7 +151,7 @@ export function useQuickPick<T extends QuickPickItem>(
   watchEffect(() => quickPick.selectedItems = selectedItems.value)
 
   return {
-    ...quickPick,
+    quickPick,
     /**
      * @see {@linkcode QuickPick.value}
      */
