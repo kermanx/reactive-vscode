@@ -5,6 +5,7 @@ export default antfu(
   {
     ignores: [
       'packages/reactivity/**/*.ts',
+      'docs/slides/slides.md',
     ],
   },
   {

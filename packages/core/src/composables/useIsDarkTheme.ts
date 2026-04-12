@@ -1,14 +1,16 @@
+import type { ColorTheme } from 'vscode'
 import { computed } from '@reactive-vscode/reactivity'
 import { ColorThemeKind } from 'vscode'
-import { createSingletonComposable } from '../utils'
+import { defineService } from '../utils'
 import { useActiveColorTheme } from './useActiveColorTheme'
 
 /**
- * Determines if the current color theme is dark. See `vscode::ColorTheme.kind`.
+ * Determines if the current color theme is dark.
  *
+ * @see {@linkcode ColorTheme.kind}
  * @category window
  */
-export const useIsDarkTheme = createSingletonComposable(() => {
+export const useIsDarkTheme = defineService(() => {
   const theme = useActiveColorTheme()
 
   return computed(() => theme.value.kind === ColorThemeKind.Dark || theme.value.kind === ColorThemeKind.HighContrast)

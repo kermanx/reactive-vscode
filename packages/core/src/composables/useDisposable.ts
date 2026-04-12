@@ -3,8 +3,9 @@ import { getCurrentScope } from '@reactive-vscode/reactivity'
 import { extensionScope } from '../utils'
 
 /**
- * Dispose the disposable when the current scope is disposed. See `vscode::Disposable`.
+ * Dispose the disposable when the current scope is disposed.
  *
+ * @see {@linkcode Disposable}
  * @category lifecycle
  */
 export function useDisposable<T extends Disposable>(disposable: T): T {

@@ -2,9 +2,10 @@ import { defineConfig } from 'tsdown'
 
 export default defineConfig({
   entry: ['src/extension.ts'],
-  format: ['esm'],
-  target: 'node20',
-  minify: true,
+  format: ['cjs'],
+  target: 'node22',
+  minify: false,
+  sourcemap: true,
   external: [
     'vscode',
   ],

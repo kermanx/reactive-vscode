@@ -1,8 +1,8 @@
 import type { TreeViewNode } from 'reactive-vscode'
-import { computed, createSingletonComposable, useTreeView } from 'reactive-vscode'
+import { computed, defineService, useTreeView } from 'reactive-vscode'
 import { TreeItemCollapsibleState } from 'vscode'
 
-export const useDemoTreeView = createSingletonComposable(() => {
+export const useDemoTreeView = defineService(() => {
   function getRootNode(index: number) {
     return {
       children: [

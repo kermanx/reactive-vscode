@@ -1,6 +1,6 @@
-import { computed, createSingletonComposable, ref, useWebviewView } from 'reactive-vscode'
+import { computed, defineService, ref, useWebviewView } from 'reactive-vscode'
 
-export const useDemoWebviewView = createSingletonComposable(() => {
+export const useDemoWebviewView = defineService(() => {
   const message = ref('')
   const html = computed(() => `
   <script>

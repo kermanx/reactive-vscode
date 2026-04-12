@@ -39,13 +39,13 @@ export class Position implements vscode.Position {
   translate(lineDeltaOrChange: number | { lineDelta?: number, characterDelta?: number } = 0, characterDelta = 0): Position {
     return typeof lineDeltaOrChange === 'object'
       ? new Position(
-        (lineDeltaOrChange.lineDelta ?? 0) + this.line,
-        (lineDeltaOrChange.characterDelta ?? 0) + this.character,
-      )
+          (lineDeltaOrChange.lineDelta ?? 0) + this.line,
+          (lineDeltaOrChange.characterDelta ?? 0) + this.character,
+        )
       : new Position(
-        lineDeltaOrChange + this.line,
-        characterDelta + this.character,
-      )
+          lineDeltaOrChange + this.line,
+          characterDelta + this.character,
+        )
   }
 
   with(line?: number, character?: number): Position
@@ -53,12 +53,12 @@ export class Position implements vscode.Position {
   with(lineOrChange?: number | { line?: number, character?: number }, character?: number): Position {
     return typeof lineOrChange === 'object'
       ? new Position(
-        lineOrChange.line ?? this.line,
-        lineOrChange.character ?? this.character,
-      )
+          lineOrChange.line ?? this.line,
+          lineOrChange.character ?? this.character,
+        )
       : new Position(
-        lineOrChange ?? this.line,
-        character ?? this.character,
-      )
+          lineOrChange ?? this.line,
+          character ?? this.character,
+        )
   }
 }

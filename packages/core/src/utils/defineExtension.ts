@@ -20,12 +20,12 @@ export function defineExtension<T>(setup: (context: ExtensionContext) => T) {
     activate: (context: ExtensionContext) => {
       extensionContext.value = context
       return extensionScope.run(() => {
-        activateCbs.map(fn => fn(context))
+        activateCbs.forEach(fn => fn(context))
         return setup(context)
       })
     },
-    deactivate: () => {
-      deactivateCbs.map(fn => fn())
+    deactivate: async () => {
+      await Promise.allSettled(deactivateCbs.map(fn => fn()))
       extensionScope.stop()
     },
   }

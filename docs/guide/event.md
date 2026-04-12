@@ -23,6 +23,7 @@ export = defineExtension(() => {
 <!-- eslint-disable import/first -->
 ```ts
 import type { Event } from 'vscode'
+
 declare function someVscodeApi(options: { onSomeEvent: Event<string> }): void
 // ---cut---
 import { defineExtension, useEventEmitter } from 'reactive-vscode'
@@ -30,15 +31,15 @@ import { defineExtension, useEventEmitter } from 'reactive-vscode'
 export = defineExtension(() => {
   const myEvent = useEventEmitter<string>([/* optional listenrs */])
 
-  myEvent.addListener((msg) => {
-    console.log(`Received message: ${msg}`)
-  })
-
-  myEvent.fire('Hello, World!')
-
   someVscodeApi({
     onSomeEvent: myEvent.event,
   })
+
+  myEvent.event((msg) => {
+    console.log('Received message:', msg)
+  })
+
+  myEvent.fire('Hello, World!')
 })
 ```
 

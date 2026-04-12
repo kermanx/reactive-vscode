@@ -1,0 +1,12 @@
+shellEmulator: true
+
+trustPolicy: no-downgrade
+
+packages:
+  - 'packages/*'
+  - demo
+  - docs
+  - test
+onlyBuiltDependencies:
+  - esbuild
+  - simple-git-hooks

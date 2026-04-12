@@ -25,7 +25,7 @@ const showCategory = computed(() => !search.value && (!sortMethod.value || sortM
 const items = computed(() => {
   let fn = metadata.functions.filter(i => !i.internal)
   if (hasOriginal.value)
-    fn = fn.filter(i => i.original)
+    fn = fn.filter(i => i.original?.length)
   if (isComposable.value)
     fn = fn.filter(i => i.isComposable)
   if (!category.value)

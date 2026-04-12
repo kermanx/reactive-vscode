@@ -4,7 +4,12 @@ import { renderMarkdown } from '../utils'
 
 const props = defineProps<{ fns: string[] }>()
 
-const m = props.fns.map(n => metadata.functions.find(m => m.name === n)!)
+const m = props.fns.map((n) => {
+  const f = metadata.functions.find(m => m.name === n)
+  if (!f)
+    throw new Error(`Function metadata not found for function: ${n}`)
+  return f
+})
 </script>
 
 <template>

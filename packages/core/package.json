@@ -1,7 +1,7 @@
 {
   "name": "reactive-vscode",
   "type": "module",
-  "version": "0.3.1",
+  "version": "1.0.0-beta.2",
   "description": "Develop VSCode extension with Vue Reactivity API",
   "author": "_Kerman <kermanx@qq.com>",
   "license": "MIT",
@@ -45,10 +45,10 @@
     "@reactive-vscode/reactivity": "workspace:*"
   },
   "devDependencies": {
-    "@types/node": "^20.19.1",
-    "@types/vscode": "^1.101.0",
-    "typescript": "^5.8.3",
-    "vite": "^5.4.19",
+    "@types/node": "^25.0.3",
+    "@types/vscode": "^1.107.0",
+    "typescript": "^5.9.3",
+    "vite": "^7.3.0",
     "vite-plugin-dts": "^4.5.4"
   },
   "publishConfig": {

@@ -60,12 +60,12 @@ The `children` property in nodes is used to define the children of the node. The
 
 If you want to trigger an update based on some reactive values that aren't tracked in `treeData`, you can pass them to the `watchSource` option.
 
-::: details About `reactive::createSingletonComposable`
-`reactive::createSingletonComposable` is a helper function to create a singleton composable. It will only create the composable once and return the same instance every time it is called.
+::: details About `reactive::defineService`
+`reactive::defineService` defines a logic that should only be executed once, and can be used in multiple places. The function passed to `defineService` will be executed in a detached effect scope when it is called the first time, and the result will be cached and returned in subsequent calls. When the extension is deactivated, the effect scope created by `defineService` will be stopped automatically.
 :::
 
 ::: warning
-For the above example, `useDemoTreeView` should **not** be called at the top-level in the module, because the extension context is not available at that time. Instead, you should **always** call it in the `setup` function.
+For the above example, `useDemoTreeView` should **not** be called at the top-level in the module, because the extension context is not available at that time. Instead, you should call it from the setup function of `defineExtension` (i.e. when the extension is activated).
 :::
 
 ## Register Webview

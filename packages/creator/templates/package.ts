@@ -10,7 +10,7 @@ export default (publisher: string, identifier: string, displayName: string, core
   ],
   "main": "./dist/extension.js",
   "engines": {
-    "vscode": "^1.100.0"
+    "vscode": "^1.99.0"
   },
   "activationEvents": [
     "onStartupFinished"
@@ -41,10 +41,10 @@ export default (publisher: string, identifier: string, displayName: string, core
   },
   "devDependencies": {
     "@types/node": "22.x",
-    "@types/vscode": "^1.101.0",
+    "@types/vscode": "^1.99.0",
     "reactive-vscode": "${coreVersion}",
-    "tsdown": "^0.12.8",
-    "typescript": "^5.8.3"
+    "tsdown": "^0.15.11",
+    "typescript": "^5.9.3"
   }
 }
 `

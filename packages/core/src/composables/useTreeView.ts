@@ -1,80 +1,137 @@
 import type { MaybeRefOrGetter } from '@reactive-vscode/reactivity'
-import type { TreeDataProvider, TreeItem, TreeView, TreeViewOptions, ViewBadge } from 'vscode'
-import type { AnyWatchSource, Awaitable } from '../utils'
-import { toValue, watch } from '@reactive-vscode/reactivity'
+import type { TreeDataProvider, TreeItem, TreeView, TreeViewOptions } from 'vscode'
+import type { Awaitable, EventListener } from '../utils'
+import { shallowRef, toValue, watch } from '@reactive-vscode/reactivity'
 import { window } from 'vscode'
-import { createKeyedComposable } from '../utils'
 import { useDisposable } from './useDisposable'
 import { useEventEmitter } from './useEventEmitter'
-import { useViewBadge } from './useViewBadge'
-import { useViewTitle } from './useViewTitle'
+import { useReactiveEvents } from './useReactiveEvents'
+import { useReactiveOptions } from './useReactiveOptions'
+import { useViewVisibility } from './useViewVisibility'
 
 export interface TreeViewNode {
   readonly children?: Awaitable<this[]>
   readonly treeItem: TreeItem | Thenable<TreeItem>
 }
 
-export type UseTreeViewOptions<T> =
-  & Omit<TreeViewOptions<T>, 'treeDataProvider'>
-  & Pick<TreeDataProvider<T>, 'resolveTreeItem'>
-  & {
-    title?: MaybeRefOrGetter<string | undefined>
-    badge?: MaybeRefOrGetter<ViewBadge | undefined>
-    /**
-     * Additional watch source to trigger a change event. Useful when `treeItem` is a promise.
-     */
-    watchSource?: AnyWatchSource
-  }
+export type TreeViewProps<T>
+  = & Omit<TreeViewOptions<T>, 'treeDataProvider'>
+    & Pick<TreeDataProvider<T>, 'resolveTreeItem'>
+    & {
+      /**
+       * @see {@linkcode TreeView.onDidExpandElement}
+       */
+      onDidExpandElement?: EventListener<TreeView<T>['onDidExpandElement']>
+
+      /**
+       * @see {@linkcode TreeView.onDidCollapseElement}
+       */
+      onDidCollapseElement?: EventListener<TreeView<T>['onDidCollapseElement']>
+
+      /**
+       * @see {@linkcode TreeView.onDidChangeSelection}
+       */
+      onDidChangeSelection?: EventListener<TreeView<T>['onDidChangeSelection']>
+
+      /**
+       * @see {@linkcode TreeView.onDidChangeVisibility}
+       */
+      onDidChangeVisibility?: EventListener<TreeView<T>['onDidChangeVisibility']>
+
+      /**
+       * @see {@linkcode TreeView.onDidChangeCheckboxState}
+       */
+      onDidChangeCheckboxState?: EventListener<TreeView<T>['onDidChangeCheckboxState']>
+
+      /**
+       * @see {@linkcode TreeView.message}
+       */
+      message?: MaybeRefOrGetter<TreeView<T>['message']>
+
+      /**
+       * @see {@linkcode TreeView.title}
+       */
+      title?: MaybeRefOrGetter<TreeView<T>['title']>
+
+      /**
+       * @see {@linkcode TreeView.description}
+       */
+      description?: MaybeRefOrGetter<TreeView<T>['description']>
+
+      /**
+       * @see {@linkcode TreeView.badge}
+       */
+      badge?: MaybeRefOrGetter<TreeView<T>['badge']>
+    }
 
 /**
- * Register a tree view. See `vscode::window.createTreeView`.
- *
+ * @reactive {@linkcode window.createTreeView}
  * @category view
  */
-export const useTreeView = createKeyedComposable(
-  <T extends TreeViewNode>(
-    viewId: string,
-    treeData: MaybeRefOrGetter<Awaitable<T[]>>,
-    options?: UseTreeViewOptions<T>,
-  ): TreeView<T> => {
-    const changeEventEmitter = useEventEmitter<void>()
-
-    watch(treeData, () => changeEventEmitter.fire())
-
-    if (options?.watchSource)
-      watch(options.watchSource, () => changeEventEmitter.fire())
-
-    const childrenToParentMap = new WeakMap<T, T>()
-
-    const view = useDisposable(window.createTreeView(viewId, {
-      ...options,
-      treeDataProvider: {
-        ...options,
-        onDidChangeTreeData: changeEventEmitter.event,
-        getTreeItem(node: T) {
-          return node.treeItem
-        },
-        async getChildren(node?: T) {
-          if (node) {
-            const children = await node.children
-            children?.forEach(child => childrenToParentMap.set(child, node))
-            return children
-          }
-          return toValue(treeData)
-        },
-        getParent(node: T) {
-          return childrenToParentMap.get(node)
-        },
+export function useTreeView<T extends TreeViewNode>(
+  viewId: string,
+  treeData: MaybeRefOrGetter<Awaitable<T[]>>,
+  options: TreeViewProps<T> = {},
+) {
+  const changeEventEmitter = useEventEmitter<void>()
+  const childrenToParentMap = new WeakMap<T, T>()
+  const view = useDisposable(window.createTreeView<T>(viewId, {
+    ...options,
+    treeDataProvider: {
+      onDidChangeTreeData: changeEventEmitter.event,
+      getTreeItem(node: T) {
+        return node.treeItem
       },
-    }))
+      async getChildren(node?: T) {
+        if (node) {
+          const children = await node.children
+          children?.forEach(child => childrenToParentMap.set(child, node))
+          return children
+        }
+        return toValue(treeData)
+      },
+      getParent(node: T) {
+        return childrenToParentMap.get(node)
+      },
+      resolveTreeItem: options.resolveTreeItem,
+    },
+  }))
 
-    if (options?.title)
-      useViewTitle(view, options.title)
+  watch(treeData, () => changeEventEmitter.fire())
 
-    if (options?.badge)
-      useViewBadge(view, options.badge)
+  useReactiveOptions(view, options, [
+    'message',
+    'title',
+    'description',
+    'badge',
+  ])
 
-    return view
-  },
-  viewId => viewId,
-)
+  useReactiveEvents(view, options, [
+    'onDidExpandElement',
+    'onDidCollapseElement',
+    'onDidChangeSelection',
+    'onDidChangeVisibility',
+    'onDidChangeCheckboxState',
+  ])
+
+  const selection = shallowRef(view.selection)
+  useDisposable(view.onDidChangeSelection((e) => {
+    selection.value = e.selection
+  }))
+
+  return {
+    view,
+    /**
+     * @see {@linkcode TreeView.selection}
+     */
+    selection,
+    /**
+     * @see {@linkcode TreeView.visible}
+     */
+    visible: useViewVisibility(view),
+    /**
+     * @see {@linkcode TreeView.reveal}
+     */
+    reveal: view.reveal.bind(view),
+  }
+}

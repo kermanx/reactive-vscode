@@ -1,4 +1,6 @@
-type OnDeactivateCb = () => void
+import type { Awaitable } from './types'
+
+type OnDeactivateCb = () => Awaitable<void>
 
 /**
  * @internal

@@ -1,26 +1,30 @@
 import type { MaybeRefOrGetter } from '@reactive-vscode/reactivity'
 import type { TextEditor, TextEditorSelectionChangeKind } from 'vscode'
 import type { MaybeNullableRefOrGetter } from '../utils'
-import { computed, shallowRef, toValue, watch } from '@reactive-vscode/reactivity'
+import { computed, isRef, shallowRef, toValue, watch } from '@reactive-vscode/reactivity'
 import { window } from 'vscode'
 import { useDisposable } from './useDisposable'
 
 /**
- * @reactive `TextEditor.selections`
+ * @reactive {@linkcode TextEditor.selections}
  * @category editor
  */
 export function useTextEditorSelections(textEditor: MaybeNullableRefOrGetter<TextEditor>, acceptKind?: MaybeRefOrGetter<(TextEditorSelectionChangeKind | undefined)[]>) {
   const selections = shallowRef(toValue(textEditor)?.selections ?? [])
 
-  watch(textEditor, () => {
-    selections.value = toValue(textEditor)?.selections ?? []
-  })
+  if (isRef(textEditor) || typeof textEditor === 'function') {
+    watch(textEditor, (textEditor) => {
+      selections.value = textEditor?.selections ?? []
+    })
+  }
 
   useDisposable(window.onDidChangeTextEditorSelection((ev) => {
-    const editor = toValue(textEditor)
-    const kinds = toValue(acceptKind)
-    if (ev.textEditor === editor && (!kinds || kinds.includes(ev.kind)))
-      selections.value = ev.selections
+    if (ev.textEditor === toValue(textEditor)) {
+      const kinds = toValue(acceptKind)
+      if (!kinds || kinds.includes(ev.kind)) {
+        selections.value = ev.selections
+      }
+    }
   }))
 
   return computed({

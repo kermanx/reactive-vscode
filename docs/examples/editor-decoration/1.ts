@@ -1,12 +1,14 @@
-import { defineConfigs, defineExtension, useActiveEditorDecorations } from 'reactive-vscode'
+import { defineConfig, defineExtension, useActiveTextEditor, useEditorDecorations } from 'reactive-vscode'
 
-const { decorations } = defineConfigs('demo', { decorations: Boolean })
+const config = defineConfig<{ decorations: boolean }>('demo')
 
 export = defineExtension(() => {
-  useActiveEditorDecorations(
+  const editor = useActiveTextEditor()
+  useEditorDecorations(
+    editor,
     {
       backgroundColor: 'red',
     },
-    () => decorations.value ? [/* ... Caclulated ranges ... */] : [],
+    () => config.decorations ? [/* ... Caclulated ranges ... */] : [],
   )
 })
