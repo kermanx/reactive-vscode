@@ -1,6 +1,6 @@
-shellEmulator: true
+# eslint-disable pnpm/yaml-enforce-settings
 
-trustPolicy: no-downgrade
+shellEmulator: true
 
 packages:
   - 'packages/*'

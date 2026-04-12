@@ -47,7 +47,6 @@ You can do these things in the setup function:
 
 Here is an example:
 
-<!-- eslint-disable import/first -->
 ```ts
 import { defineConfig, defineExtension, defineLogger, useCommand, useIsDarkTheme, watchEffect } from 'reactive-vscode'
 import { window } from 'vscode'

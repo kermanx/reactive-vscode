@@ -7,6 +7,11 @@ export default antfu(
       'packages/reactivity/**/*.ts',
       'docs/slides/slides.md',
     ],
+    rules: {
+      'e18e/prefer-static-regex': 'off',
+      'markdown/require-alt-text': 'off',
+      'markdown/heading-increment': 'off',
+    },
   },
   {
     files: ['**/*.ts'],

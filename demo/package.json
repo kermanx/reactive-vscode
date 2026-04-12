@@ -65,11 +65,11 @@
   "devDependencies": {
     "@reactive-vscode/mock": "workspace:*",
     "@types/node": "22.x",
-    "@types/vscode": "^1.107.0",
+    "@types/vscode": "^1.115.0",
     "reactive-vscode": "workspace:*",
-    "tsdown": "^0.18.2",
-    "typescript": "^5.9.3",
-    "vite": "^7.3.0",
-    "vitest": "^4.0.16"
+    "tsdown": "^0.21.7",
+    "typescript": "^5.8.2",
+    "vite": "^8.0.8",
+    "vitest": "^4.1.4"
   }
 }
