@@ -59,6 +59,7 @@ export function defineLogger(name: string) {
 
   return {
     logger: computed(() => logger.value),
+    logLevel: computed(() => logLevel.value),
     ...wrapped,
   }
 }
