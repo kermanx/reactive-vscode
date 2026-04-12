@@ -33,8 +33,10 @@
     "typecheck": "echo tsc --noEmit",
     "prepublishOnly": "pnpm typecheck"
   },
+  "peerDependencies": {
+    "vitest": "*"
+  },
   "dependencies": {
-    "vitest": "^4.0.16",
     "vscode-uri": "^3.1.0"
   },
   "devDependencies": {
