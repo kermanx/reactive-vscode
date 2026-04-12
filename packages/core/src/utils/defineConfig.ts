@@ -35,9 +35,14 @@ export function defineConfig<C extends object>(section: Nullable<string>, scope?
   }
 
   function buildProxy(base: string) {
+    const currentTarget = (): any => {
+      const config = getWorkspaceConfig()
+      return base === '' ? config : config.get(base.slice(0, -1)) ?? {}
+    }
     return new Proxy<any>({}, {
       get(_, key) {
         const config = getWorkspaceConfig()
+
         if (typeof key !== 'string') {
           throw new TypeError('Symbol keys are not supported in defineConfig proxy.')
         }
@@ -63,38 +68,26 @@ export function defineConfig<C extends object>(section: Nullable<string>, scope?
         config.update(base + key, value)
         return true
       },
-      apply: notSupported,
-      construct: notSupported,
       defineProperty(_, property, attributes) {
-        const config = getWorkspaceConfig()
-        return Reflect.defineProperty(config, property, attributes)
+        return Reflect.defineProperty(currentTarget(), property, attributes)
       },
       deleteProperty(_, p) {
-        const config = getWorkspaceConfig()
-        return Reflect.deleteProperty(config, p)
-      },
-      getOwnPropertyDescriptor(_, p) {
-        const config = getWorkspaceConfig()
-        return Reflect.getOwnPropertyDescriptor(config, p)
-      },
-      getPrototypeOf(_) {
-        const config = getWorkspaceConfig()
-        return Reflect.getPrototypeOf(config)
+        return Reflect.deleteProperty(currentTarget(), p)
       },
       has(_, p) {
-        const config = getWorkspaceConfig()
-        return Reflect.has(config, p)
-      },
-      isExtensible(_) {
-        const config = getWorkspaceConfig()
-        return Reflect.isExtensible(config)
+        return Reflect.has(currentTarget(), p)
       },
       ownKeys(_) {
-        const config = getWorkspaceConfig()
-        return Reflect.ownKeys(config)
+        return Reflect.ownKeys(currentTarget())
       },
-      preventExtensions: notSupported,
-      setPrototypeOf: notSupported,
+      getOwnPropertyDescriptor(_, p) {
+        const descriptor = Reflect.getOwnPropertyDescriptor(currentTarget(), p)
+        if (descriptor) {
+          // Avoid 'getOwnPropertyDescriptor' on proxy: trap reported non-configurability for property 'x' which is either non-existent or configurable in the proxy target
+          descriptor.configurable = true
+        }
+        return descriptor
+      },
     })
   }
 
@@ -107,8 +100,4 @@ export function defineConfig<C extends object>(section: Nullable<string>, scope?
   })
 
   return buildProxy('')
-}
-
-function notSupported(): never {
-  throw new Error('Not supported')
 }
