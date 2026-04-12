@@ -27,7 +27,7 @@ export interface WebviewViewProps extends WebviewCreationOptions {
   badge?: MaybeRefOrGetter<WebviewView['badge']>
 
   /**
-   * @see {@linkcode WebviewViewOptions.onDidDispose}
+   * @see {@linkcode WebviewView.onDidDispose}
    */
   onDidDispose?: EventListener<WebviewView['onDidDispose']>
 

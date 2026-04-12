@@ -12,7 +12,7 @@ export default defineConfig({
       rollupTypes: true,
       beforeWriteFile(_, content) {
         return {
-          content: content.replaceAll('\'@vue/reactivity\'', '\'@reactive-vscode/reactivity\''),
+          content: `import { chat, commands, debug, env, extensions, l10n, lm, window, workspace } from 'vscode';\n${content.replaceAll('\'@vue/reactivity\'', '\'@reactive-vscode/reactivity\'')}`,
         }
       },
     }),
