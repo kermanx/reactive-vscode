@@ -3,7 +3,6 @@ import type { Nullable } from './types'
 import { shallowRef } from '@reactive-vscode/reactivity'
 import { workspace } from 'vscode'
 import { useDisposable } from '../composables'
-import { extensionContext } from './defineExtension'
 import { onActivate } from './onActivate'
 
 /**
@@ -25,13 +24,7 @@ export function defineConfig<C extends object>(section: Nullable<string>, scope?
     return workspaceConfig.value = workspace.getConfiguration(section ?? undefined, scope)
   }
   function getWorkspaceConfig() {
-    if (!extensionContext.value) {
-      throw new Error('Cannot access config before extension is activated.')
-    }
-    if (workspaceConfig.value) {
-      return workspaceConfig.value
-    }
-    return updateWorkspaceConfig()
+    return workspaceConfig.value || updateWorkspaceConfig()
   }
 
   function buildProxy(base: string) {
