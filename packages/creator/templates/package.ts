@@ -8,7 +8,7 @@ export default (publisher: string, identifier: string, displayName: string, core
   "categories": [
     "Other"
   ],
-  "main": "./dist/extension.cjs",
+  "main": "./dist/extension.js",
   "engines": {
     "vscode": "^1.99.0"
   },
