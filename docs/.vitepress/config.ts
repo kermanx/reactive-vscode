@@ -104,6 +104,14 @@ export default defineConfig({
                 logo: () => readFile(resolve(__dirname, '../public/logo.svg'), 'utf-8'),
               },
             },
+            customizations: {
+              iconCustomizer(collection, icon, props) {
+                if (collection === 'reactive-vscode' && icon === 'logo') {
+                  props.width = '1em'
+                  props.height = '1em'
+                }
+              },
+            },
           }),
         ],
         theme: {
