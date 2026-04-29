@@ -31,7 +31,7 @@ And press `F5` to start the extension.
 To develop the documentation, run
 
 ```bash
-pnpm dev:docs
+pnpm docs:dev
 ```
 
 To run the tests, run
