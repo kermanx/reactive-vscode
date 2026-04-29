@@ -1,6 +1,6 @@
 export default (publisher: string, identifier: string, displayName: string) => `# ${displayName}
 
-[![Version](https://img.shields.io/visual-studio-marketplace/v/${publisher}.${identifier})](https://marketplace.visualstudio.com/items?itemName=${publisher}.${identifier}) [![Installs](https://img.shields.io/visual-studio-marketplace/i/${publisher}.${identifier})](https://marketplace.visualstudio.com/items?itemName=${publisher}.${identifier}) [![Reactive VSCode](https://img.shields.io/badge/made_with-reactive--vscode-%23007ACC?style=flat&labelColor=%23229863)](https://kermanx.com/reactive-vscode/)
+[![Version](https://badgen.net/vs-marketplace/v/${publisher}.${identifier})](https://marketplace.visualstudio.com/items?itemName=${publisher}.${identifier}) [![Installs](https://badgen.net/vs-marketplace/i/${publisher}.${identifier})](https://marketplace.visualstudio.com/items?itemName=${publisher}.${identifier}) [![Reactive VSCode](https://img.shields.io/badge/made_with-reactive--vscode-%23007ACC?style=flat&labelColor=%23229863)](https://kermanx.com/reactive-vscode/)
 
 A VS Code extension created with [reactive-vscode](https://kermanx.com/reactive-vscode/).
 
@@ -13,7 +13,7 @@ A VS Code extension created with [reactive-vscode](https://kermanx.com/reactive-
 
 - Open this repository in VS Code.
 - Run \`pnpm install\` to install the dependencies.
-- Run \`pnpm dev\` to compile the extension and watch for changes.  
+- Run \`pnpm dev\` to compile the extension and watch for changes.
 - Press \`F5\` to open a new window with your extension loaded.
 - Run your command from the command palette by pressing (\`Ctrl+Shift+P\` or \`Cmd+Shift+P\` on Mac) and typing \`Hello World\`.
 - Set breakpoints in your code inside \`src/extension.ts\` to debug your extension.
