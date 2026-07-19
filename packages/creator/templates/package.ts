@@ -41,7 +41,7 @@ export default (publisher: string, identifier: string, displayName: string, core
   },
   "devDependencies": {
     "@types/node": "22.x",
-    "@types/vscode": "^1.99.0",
+    "@types/vscode": "~1.99.0",
     "reactive-vscode": "${coreVersion}",
     "tsdown": "^0.15.11",
     "typescript": "^5.9.3"
